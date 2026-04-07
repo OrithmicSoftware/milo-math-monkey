@@ -1,12 +1,89 @@
-# milo-math-monkey
+# 🐵 Milo the Math Monkey
 
-Count it right… or watch Milo take a tumble!
+> **Count it right… or watch Milo take a tumble!**
 
-## Character prototype
+Milo is a goofy, overconfident monkey who loves numbers — but always gets into trouble using them. Kids help Milo solve simple math problems before things go hilariously wrong!
 
-This repository now includes a lightweight browser prototype for Milo, the main
-character. Open `index.html` from the project root in a browser to preview:
+---
 
-- a Milo character inspired by the provided monkey reference art
-- simple SVG-based idle/reach/celebration animation loops suitable for a browser game
-- a small funny-sound board implemented with the Web Audio API
+## 🎮 Mini-Games
+
+| Game | Topic | What goes wrong? |
+|---|---|---|
+| 🎈 **Counting Chaos** | Counting 1–20 | Too many balloons — Milo flies away! |
+| 📏 **Measuring Mayhem** | Size & comparison | Wrong answer — Milo falls into jelly! |
+| 🍌 **Sharing Snacks** | Addition, subtraction & division | Wrong share — characters roll off with ALL the snacks! |
+| ⚖️ **Weight Trouble** | Heavier & lighter | Wrong comparison — Milo gets launched off the seesaw! |
+
+## 🧠 Learning Focus
+
+- Counting (1–20)
+- Basic addition & subtraction
+- Size and comparison
+- Early logic and estimation
+
+---
+
+## 🚀 Playing the Game
+
+Open `index.html` in any modern browser — no build step required.
+
+```bash
+# macOS / Linux
+open index.html
+
+# Windows
+start index.html
+```
+
+## 🎨 Character Concept Prototype
+
+A separate browser prototype for Milo's visual direction is available at `character.html`.
+It includes:
+
+- a standalone SVG Milo inspired by the provided monkey reference art
+- lightweight idle / reach / celebration motion loops suitable for browser gameplay
+- a small funny-sound board built with the Web Audio API
+
+Open `character.html` from the project root to preview the character concept on its own.
+
+---
+
+## 🌐 Deployments
+
+| Environment | URL | Triggered by |
+|---|---|---|
+| **Production** | `https://orithmicsoftware.github.io/milo-math-monkey/` | Push to `main` |
+| **Staging** | `https://orithmicsoftware.github.io/milo-math-monkey/staging/` | Push to any feature branch or PR |
+| **Character prototype (staging)** | `https://orithmicsoftware.github.io/milo-math-monkey/staging/character.html` | Included with staging deploys |
+
+Both environments are deployed automatically to GitHub Pages via GitHub Actions.  
+The **staging** environment shows a visible pink banner at the top of the page so it cannot be confused with production.
+
+### How it works
+
+```
+main branch  ──push──▶  deploy-production.yml  ──▶  gh-pages /          (production)
+feature/*    ──push──▶  deploy-staging.yml     ──▶  gh-pages /staging/  (staging)
+pull request ──open──▶  deploy-staging.yml     ──▶  gh-pages /staging/  + PR comment
+```
+
+GitHub Pages is configured to serve the `gh-pages` branch.
+
+---
+
+## 🗂 Project Structure
+
+```
+├── index.html          # Game UI (all screens)
+├── style.css           # Colorful, kid-friendly styles & animations
+├── game.js             # Game logic for all four mini-games
+├── config.js           # Environment flag (production | staging)
+├── character.html      # Standalone Milo character concept prototype
+├── styles.css          # Styling for the character prototype
+├── script.js           # Sound + animation hooks for the character prototype
+└── .github/
+    └── workflows/
+        ├── deploy-production.yml   # Production deployment
+        └── deploy-staging.yml      # Staging deployment + PR comment
+```

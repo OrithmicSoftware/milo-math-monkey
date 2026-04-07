@@ -1,0 +1,80 @@
+name: Deploy – Staging
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - gh-pages
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# One staging deployment per branch at a time
+concurrency:
+  group: pages-staging-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write        # push to gh-pages branch
+  pull-requests: write   # post PR comments
+
+jobs:
+  deploy:
+    name: Deploy to GitHub Pages (staging)
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/staging/
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set environment to staging
+        run: sed -i "s/window\.MILO_ENV = .*/window.MILO_ENV = 'staging';/" config.js
+
+      - name: Deploy to gh-pages (staging subdirectory)
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: .
+          target-folder: staging
+          clean: true
+          commit-message: "chore: deploy staging build from ${{ github.sha }}"
+
+      - name: Post staging URL to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+            const sha   = context.payload.pull_request.head.sha.slice(0, 7);
+            const url   = `https://${owner}.github.io/${repo}/staging/`;
+            const body  = [
+              '## 🐵 Staging Preview',
+              '',
+              `| | |`,
+              `|---|---|`,
+              `| 🚀 **URL** | [${url}](${url}) |`,
+              `| 🔖 **Commit** | \`${sha}\` |`,
+              `| 🌿 **Branch** | \`${context.payload.pull_request.head.ref}\` |`,
+              '',
+              '> ⚠️ This is a **staging** deployment — a pink banner is shown at the top of the page.',
+            ].join('\n');
+
+            // Update existing bot comment if present, otherwise create a new one
+            const { data: comments } = await github.rest.issues.listComments({
+              owner, repo, issue_number: context.issue.number,
+            });
+            const existing = comments.find(
+              c => c.user.type === 'Bot' && c.body.includes('Staging Preview')
+            );
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner, repo, comment_id: existing.id, body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: context.issue.number, body,
+              });
+            }

@@ -1,115 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Milo Math Monkey</title>
-    <link rel="stylesheet" href="./styles.css" />
-  </head>
-  <body>
-    <main class="page">
-      <section class="hero">
-        <div class="hero-copy">
-          <p class="eyebrow">Character concept</p>
-          <h1>Meet Milo, the cheeky math monkey.</h1>
-          <p class="intro">
-            Milo is a mischievous little guide for the browser game. He reaches for
-            rewards, celebrates correct answers, and reacts with a bundle of goofy
-            sound effects.
-          </p>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Milo the Math Monkey 🐵</title>
+  <meta name="description" content="Count it right… or watch Milo take a tumble! A fun early-learning math game for kids." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
 
-          <div class="controls" aria-label="Milo controls">
-            <button type="button" data-action="reach">Reach for bananas</button>
-            <button type="button" data-action="celebrate">Celebrate</button>
-            <button type="button" data-action="random-sound">Play random funny sound</button>
-          </div>
+  <!-- ══════════════════════════════════════
+       WELCOME SCREEN
+  ══════════════════════════════════════ -->
+  <section id="welcome-screen" class="screen">
+    <div class="logo-badge" aria-label="Milo the monkey hanging from a number 5">🐵</div>
+    <h1 class="game-title">Milo the<br>Math Monkey</h1>
+    <p class="game-slogan">"Count it right… or watch Milo take a tumble!"</p>
+    <div class="number-decoration" aria-hidden="true">1 2 3 4 5</div>
+    <button id="play-btn" class="btn btn-play">🎮 Play!</button>
+  </section>
 
-          <ul class="soundboard" aria-label="Funny sound ideas">
-            <li><button type="button" data-sound="hoot">Curious hoot</button></li>
-            <li><button type="button" data-sound="boing">Springy boing</button></li>
-            <li><button type="button" data-sound="gasp">Banana gasp</button></li>
-            <li><button type="button" data-sound="chatter">Monkey chatter</button></li>
-          </ul>
-        </div>
+  <!-- ══════════════════════════════════════
+       MENU SCREEN
+  ══════════════════════════════════════ -->
+  <section id="menu-screen" class="screen">
+    <div class="menu-header">
+      <h2>🐵 Choose a Mini-Game!</h2>
+      <p class="score-display" id="score-display">⭐ Score: 0 / 0</p>
+    </div>
 
-        <div class="scene-card">
-          <div class="glow" aria-hidden="true"></div>
-          <svg
-            class="scene"
-            viewBox="0 0 640 500"
-            role="img"
-            aria-labelledby="scene-title scene-desc"
-          >
-            <title id="scene-title">Milo reaching for bananas on a ladder</title>
-            <desc id="scene-desc">
-              A cartoon monkey character standing by a ladder and animated bananas,
-              inspired by the provided reference image.
-            </desc>
+    <div class="games-grid">
 
-            <ellipse cx="320" cy="430" rx="220" ry="34" class="shadow" />
+      <div class="game-card" data-game="counting" role="button" tabindex="0" aria-label="Counting Chaos game">
+        <div class="card-icon">🎈</div>
+        <div class="card-title">Counting Chaos</div>
+        <div class="card-desc">Count the items before Milo grabs too many balloons and flies away!</div>
+        <span class="card-badge">Counting 1–20</span>
+      </div>
 
-            <g class="bananas">
-              <ellipse cx="338" cy="72" rx="40" ry="12" class="banana-glow" />
-              <path d="M300 62c28-22 67-19 83 5-24-5-45 8-57 25-14 0-22-14-26-30z" class="banana peel-1" />
-              <path d="M305 74c26-19 59-15 74 8-24-3-41 10-50 26-13-1-21-15-24-34z" class="banana peel-2" />
-              <path d="M322 48c-3-12 9-22 22-20-4 7-1 18 5 25l-12 5c-5-2-11-5-15-10z" class="banana stem" />
-            </g>
+      <div class="game-card" data-game="measuring" role="button" tabindex="0" aria-label="Measuring Mayhem game">
+        <div class="card-icon">📏</div>
+        <div class="card-title">Measuring Mayhem</div>
+        <div class="card-desc">Get it wrong and Milo falls face-first into the jelly!</div>
+        <span class="card-badge">Size &amp; Comparison</span>
+      </div>
 
-            <g class="ladder">
-              <line x1="250" y1="395" x2="318" y2="105" />
-              <line x1="418" y1="395" x2="352" y2="105" />
-              <line x1="288" y1="160" x2="371" y2="158" />
-              <line x1="276" y1="214" x2="383" y2="212" />
-              <line x1="264" y1="270" x2="394" y2="268" />
-              <line x1="252" y1="326" x2="406" y2="324" />
-            </g>
+      <div class="game-card" data-game="sharing" role="button" tabindex="0" aria-label="Sharing Snacks game">
+        <div class="card-icon">🍌</div>
+        <div class="card-title">Sharing Snacks</div>
+        <div class="card-desc">Wrong division and the characters roll away with ALL the snacks!</div>
+        <span class="card-badge">Add, Subtract &amp; Share</span>
+      </div>
 
-            <g transform="translate(108 164)">
-              <g class="milo">
-                <path class="tail" d="M102 180c70 5 92 55 54 74-36 17-74-22-49-41 12-10 33-4 39 13" />
-                <ellipse class="foot" cx="42" cy="229" rx="28" ry="15" />
-                <ellipse class="foot" cx="120" cy="232" rx="28" ry="15" />
-                <ellipse class="leg" cx="62" cy="196" rx="24" ry="50" />
-                <ellipse class="leg" cx="108" cy="194" rx="24" ry="50" />
-                <ellipse class="body" cx="86" cy="138" rx="62" ry="72" />
-                <ellipse class="belly" cx="90" cy="152" rx="38" ry="44" />
-                <g class="arm back-arm">
-                  <ellipse class="limb" cx="34" cy="150" rx="18" ry="44" transform="rotate(18 34 150)" />
-                  <circle class="paw" cx="24" cy="190" r="13" />
-                </g>
-                <g class="arm front-arm">
-                  <ellipse class="limb" cx="138" cy="128" rx="18" ry="56" transform="rotate(-26 138 128)" />
-                  <circle class="paw" cx="156" cy="78" r="13" />
-                </g>
-                <g class="head">
-                  <ellipse class="ear" cx="32" cy="46" rx="18" ry="22" />
-                  <ellipse class="ear" cx="128" cy="46" rx="18" ry="22" />
-                  <ellipse class="face" cx="80" cy="56" rx="60" ry="56" />
-                  <ellipse class="snout" cx="83" cy="75" rx="36" ry="26" />
-                  <circle class="eye eye-left" cx="62" cy="55" r="6" />
-                  <circle class="eye eye-right" cx="98" cy="55" r="6" />
-                  <path class="brow" d="M54 42c7-7 16-8 24-3" />
-                  <path class="brow" d="M87 39c8-4 17-3 23 4" />
-                  <path class="mouth" d="M68 87c10 10 31 10 40-2" />
-                  <path class="tuft" d="M77 6c4-14 19-16 29-5-8 1-12 9-12 18" />
-                </g>
-              </g>
-            </g>
-          </svg>
+      <div class="game-card" data-game="weight" role="button" tabindex="0" aria-label="Weight Trouble game">
+        <div class="card-icon">⚖️</div>
+        <div class="card-title">Weight Trouble</div>
+        <div class="card-desc">Wrong weight comparison launches Milo off the seesaw — BOING!</div>
+        <span class="card-badge">Heavier &amp; Lighter</span>
+      </div>
 
-          <div class="approach">
-            <h2>Animation approach</h2>
-            <p>
-              Use a layered SVG puppet with tiny transform loops: idle bobbing,
-              tail swishes, eye blinks, and quick reach/celebration poses triggered
-              by gameplay events. It stays lightweight, expressive, and easy to tune
-              for a browser game.
-            </p>
-          </div>
-        </div>
-      </section>
-    </main>
+    </div>
+  </section>
 
-    <script src="./script.js"></script>
-  </body>
+  <!-- ══════════════════════════════════════
+       GAME SCREEN
+  ══════════════════════════════════════ -->
+  <section id="game-screen" class="screen">
+
+    <div class="game-header">
+      <h2 id="game-title-label">Game Title</h2>
+      <span class="question-counter" id="question-counter">Q 1 / 5</span>
+    </div>
+
+    <!-- Milo + question scene -->
+    <div class="milo-stage">
+      <span id="milo-char" class="milo-character" aria-label="Milo the monkey">🐵</span>
+      <div class="question-scene" id="question-scene"></div>
+      <p class="question-text" id="question-text"></p>
+    </div>
+
+    <!-- Answer choices -->
+    <div class="answers-grid" id="answers-grid" role="group" aria-label="Answer choices"></div>
+
+    <!-- Feedback -->
+    <div class="feedback-banner" id="feedback-banner" role="alert" aria-live="polite"></div>
+
+    <!-- Navigation -->
+    <button id="next-btn" class="btn btn-next" style="display:none; margin-top:14px;">Next Question ➡️</button>
+    <button id="back-to-menu-btn" class="btn btn-back">⬅ Back to Menu</button>
+
+  </section>
+
+  <!-- ══════════════════════════════════════
+       RESULTS SCREEN
+  ══════════════════════════════════════ -->
+  <section id="results-screen" class="screen">
+    <div class="results-milo" aria-label="Milo celebrating">🐵</div>
+    <h2 class="results-title">Round Complete!</h2>
+    <p class="results-score" id="results-score-text"></p>
+    <p class="results-game-name" id="results-game-name" style="color:#888; font-size:.95rem; margin-bottom:10px;"></p>
+    <div class="stars" id="results-stars" aria-label="Stars earned">⭐</div>
+    <p class="results-msg" id="results-msg"></p>
+    <div class="btn-row">
+      <button id="play-again-btn" class="btn btn-primary">🔄 Play Again</button>
+      <button id="choose-game-btn" class="btn btn-success">🎮 Choose Game</button>
+    </div>
+  </section>
+
+  <!-- Environment badge – shown only in staging (set by config.js + game.js) -->
+  <div id="env-badge" style="display:none; position:fixed; top:0; left:0; right:0;
+       background:#FF4081; color:#fff; text-align:center; padding:6px 0; font-size:.9rem;
+       font-family: 'Comic Sans MS', cursive; z-index:9999; letter-spacing:1px;">
+    🚧 STAGING ENVIRONMENT — not for production use 🚧
+  </div>
+
+  <script src="config.js"></script>
+  <script src="game.js"></script>
+</body>
 </html>
