@@ -25,41 +25,13 @@
   ══════════════════════════════════════ -->
   <section id="menu-screen" class="screen">
     <div class="menu-header">
-      <h2>🐵 Choose a Mini-Game!</h2>
-      <p class="score-display" id="score-display">⭐ Score: 0 / 0</p>
+      <h2>🗺️ Milo's Jungle Level Map</h2>
+      <p class="score-display" id="score-display">⭐ Levels Cleared: 0 / 8</p>
+      <p class="map-progress" id="map-progress-text">Complete each stop on the trail to unlock the next adventure!</p>
     </div>
 
-    <div class="games-grid">
-
-      <div class="game-card" data-game="counting" role="button" tabindex="0" aria-label="Counting Chaos game">
-        <div class="card-icon">🎈</div>
-        <div class="card-title">Counting Chaos</div>
-        <div class="card-desc">Count the items before Milo grabs too many balloons and flies away!</div>
-        <span class="card-badge">Counting 1–20</span>
-      </div>
-
-      <div class="game-card" data-game="measuring" role="button" tabindex="0" aria-label="Measuring Mayhem game">
-        <div class="card-icon">📏</div>
-        <div class="card-title">Measuring Mayhem</div>
-        <div class="card-desc">Get it wrong and Milo falls face-first into the jelly!</div>
-        <span class="card-badge">Size &amp; Comparison</span>
-      </div>
-
-      <div class="game-card" data-game="sharing" role="button" tabindex="0" aria-label="Sharing Snacks game">
-        <div class="card-icon">🍌</div>
-        <div class="card-title">Sharing Snacks</div>
-        <div class="card-desc">Wrong division and the characters roll away with ALL the snacks!</div>
-        <span class="card-badge">Add, Subtract &amp; Share</span>
-      </div>
-
-      <div class="game-card" data-game="weight" role="button" tabindex="0" aria-label="Weight Trouble game">
-        <div class="card-icon">⚖️</div>
-        <div class="card-title">Weight Trouble</div>
-        <div class="card-desc">Wrong weight comparison launches Milo off the seesaw — BOING!</div>
-        <span class="card-badge">Heavier &amp; Lighter</span>
-      </div>
-
-    </div>
+    <div id="level-map" class="level-map" aria-label="Interactive level map"></div>
+    <p class="map-tip">Tap an unlocked jungle stop to play that level.</p>
   </section>
 
   <!-- ══════════════════════════════════════
@@ -99,9 +71,11 @@
     <h2 class="results-title">Round Complete!</h2>
     <p class="results-score" id="results-score-text"></p>
     <p class="results-game-name" id="results-game-name" style="color:#888; font-size:.95rem; margin-bottom:10px;"></p>
+    <p class="results-unlock" id="results-unlock-text"></p>
     <div class="stars" id="results-stars" aria-label="Stars earned">⭐</div>
     <p class="results-msg" id="results-msg"></p>
     <div class="btn-row">
+      <button id="next-level-btn" class="btn btn-next" style="display:none;">🗺️ Next Level</button>
       <button id="play-again-btn" class="btn btn-primary">🔄 Play Again</button>
       <button id="choose-game-btn" class="btn btn-success">🎮 Choose Game</button>
     </div>

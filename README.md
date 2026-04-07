@@ -15,6 +15,8 @@ Milo is a goofy, overconfident monkey who loves numbers — but always gets into
 | 🍌 **Sharing Snacks** | Addition, subtraction & division | Wrong share — characters roll off with ALL the snacks! |
 | ⚖️ **Weight Trouble** | Heavier & lighter | Wrong comparison — Milo gets launched off the seesaw! |
 
+The game now strings these mini-games into an **interactive jungle level map** with unlockable advanced stages and playful browser-generated sound effects.
+
 ## 🧠 Learning Focus
 
 - Counting (1–20)
@@ -72,4 +74,3 @@ GitHub Pages is configured to serve the `gh-pages` branch.
         ├── deploy-production.yml   # Production deployment
         └── deploy-staging.yml      # Staging deployment + PR comment
 ```
-
