@@ -58,6 +58,10 @@ function hasNextLevel(levelIndex) {
   return levelIndex + 1 < LEVELS.length;
 }
 
+function isNextLevelUnlocked(levelIndex) {
+  return hasNextLevel(levelIndex) && levelIndex + 1 < gameState.unlockedLevelCount;
+}
+
 function loadProgress() {
   try {
     const unlocked = Number(window.localStorage.getItem(STORAGE_KEYS.unlocked)) || 1;
@@ -134,9 +138,10 @@ function makeCountingQuestion(level) {
   const correct = count;
 
   const distractors = new Set();
+  const maxChoiceLimit = Math.max(maxCount + distractorRange + 2, MAX_COUNTING_LIMIT);
   while (distractors.size < 3) {
     const d = correct + randInt(-distractorRange, distractorRange);
-    if (d !== correct && d >= 1 && d <= Math.max(maxCount + distractorRange + 2, MAX_COUNTING_LIMIT)) distractors.add(d);
+    if (d !== correct && d >= 1 && d <= maxChoiceLimit) distractors.add(d);
   }
 
   return {
@@ -597,7 +602,7 @@ function showResults() {
   document.getElementById('results-unlock-text').textContent = markLevelComplete(gameState.activeLevelIndex);
 
   const nextLevelBtn = document.getElementById('next-level-btn');
-  if (hasNextLevel(gameState.activeLevelIndex) && gameState.activeLevelIndex + 1 < gameState.unlockedLevelCount) {
+  if (isNextLevelUnlocked(gameState.activeLevelIndex)) {
     nextLevelBtn.style.display = 'inline-block';
   } else {
     nextLevelBtn.style.display = 'none';
@@ -746,7 +751,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Results → next level
   document.getElementById('next-level-btn').addEventListener('click', () => {
     playSound('click');
-    if (hasNextLevel(gameState.activeLevelIndex) && gameState.activeLevelIndex + 1 < gameState.unlockedLevelCount) {
+    if (isNextLevelUnlocked(gameState.activeLevelIndex)) {
       startLevel(gameState.activeLevelIndex + 1);
     }
   });
