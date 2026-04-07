@@ -633,6 +633,11 @@ function getAudioContext() {
   return audioContext;
 }
 
+/**
+ * Play a short sequence of synthesized tones.
+ * @param {Array<{freq:number, duration?:number, type?:OscillatorType, volume?:number, gap?:number}>} tones
+ *   Tone descriptors used to build a playful sound effect.
+ */
 function playToneSequence(tones) {
   const ctx = getAudioContext();
   if (!ctx) return;
@@ -659,6 +664,11 @@ function playToneSequence(tones) {
   });
 }
 
+/**
+ * Play one of the built-in UI sound effects.
+ * Valid effects: click, start, correct, wrong, unlock, locked.
+ * @param {string} effect
+ */
 function playSound(effect) {
   const sounds = {
     click: [
