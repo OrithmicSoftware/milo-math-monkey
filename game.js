@@ -54,6 +54,10 @@ function getCurrentLevel() {
   return getLevel(gameState.activeLevelIndex);
 }
 
+function hasNextLevel(levelIndex) {
+  return levelIndex + 1 < LEVELS.length;
+}
+
 function loadProgress() {
   try {
     const unlocked = Number(window.localStorage.getItem(STORAGE_KEYS.unlocked)) || 1;
@@ -85,7 +89,7 @@ function markLevelComplete(levelIndex) {
 
   let unlockMessage = 'You cleared this level! Replay it anytime for more stars.';
   const nextLevelIndex = levelIndex + 1;
-  if (nextLevelIndex < LEVELS.length && gameState.unlockedLevelCount <= nextLevelIndex) {
+  if (hasNextLevel(levelIndex) && gameState.unlockedLevelCount <= nextLevelIndex) {
     gameState.unlockedLevelCount = nextLevelIndex + 1;
     playSound('unlock');
     unlockMessage = 'New level unlocked: ' + LEVELS[nextLevelIndex].name + '!';
@@ -119,6 +123,7 @@ const COUNTING_ITEMS = [
   { emoji: '🍎', name: 'apples'   },
   { emoji: '🌸', name: 'flowers'  },
 ];
+const MAX_COUNTING_LIMIT = 25;
 
 function makeCountingQuestion(level) {
   const item  = COUNTING_ITEMS[randInt(0, COUNTING_ITEMS.length - 1)];
@@ -131,7 +136,7 @@ function makeCountingQuestion(level) {
   const distractors = new Set();
   while (distractors.size < 3) {
     const d = correct + randInt(-distractorRange, distractorRange);
-    if (d !== correct && d >= 1 && d <= Math.max(maxCount + distractorRange + 2, 25)) distractors.add(d);
+    if (d !== correct && d >= 1 && d <= Math.max(maxCount + distractorRange + 2, MAX_COUNTING_LIMIT)) distractors.add(d);
   }
 
   return {
@@ -592,7 +597,7 @@ function showResults() {
   document.getElementById('results-unlock-text').textContent = markLevelComplete(gameState.activeLevelIndex);
 
   const nextLevelBtn = document.getElementById('next-level-btn');
-  if (gameState.activeLevelIndex + 1 < gameState.unlockedLevelCount && gameState.activeLevelIndex + 1 < LEVELS.length) {
+  if (hasNextLevel(gameState.activeLevelIndex) && gameState.activeLevelIndex + 1 < gameState.unlockedLevelCount) {
     nextLevelBtn.style.display = 'inline-block';
   } else {
     nextLevelBtn.style.display = 'none';
@@ -741,7 +746,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Results → next level
   document.getElementById('next-level-btn').addEventListener('click', () => {
     playSound('click');
-    if (gameState.activeLevelIndex + 1 < gameState.unlockedLevelCount) {
+    if (hasNextLevel(gameState.activeLevelIndex) && gameState.activeLevelIndex + 1 < gameState.unlockedLevelCount) {
       startLevel(gameState.activeLevelIndex + 1);
     }
   });
