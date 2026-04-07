@@ -26,6 +26,8 @@ const STORAGE_KEYS = {
   completed: 'miloCompletedLevels',
 };
 const STORAGE_VERSION = '1';
+const MAX_DECOY_ATTEMPTS = 20;
+const RESULTS_NAME_SEPARATOR = ' - ';
 
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -192,7 +194,7 @@ function makeMeasuringQuestion(level) {
   if (level.includeThirdChoice) {
     let decoy = correct;
     let attempts = 0;
-    while (choices.includes(decoy) && attempts < 20) {
+    while (choices.includes(decoy) && attempts < MAX_DECOY_ATTEMPTS) {
       const extraPair = randomFrom(MEASURE_PAIRS);
       decoy = Math.random() < 0.5
         ? extraPair.a.emoji + ' ' + extraPair.a.label
@@ -296,7 +298,7 @@ function makeWeightQuestion(level) {
   if (level.includeThirdChoice) {
     let decoy = correct;
     let attempts = 0;
-    while (choices.includes(decoy) && attempts < 20) {
+    while (choices.includes(decoy) && attempts < MAX_DECOY_ATTEMPTS) {
       const extraPair = randomFrom(WEIGHT_PAIRS);
       decoy = Math.random() < 0.5
         ? extraPair.a.emoji + ' ' + extraPair.a.label
@@ -609,7 +611,7 @@ function showResults() {
     'You got ' + gameState.score + ' out of ' + gameState.questionsPerRound + ' correct!';
   document.getElementById('results-stars').textContent = stars;
   document.getElementById('results-msg').textContent = msg;
-  document.getElementById('results-game-name').textContent = level.name + ' • ' + MINI_GAMES[level.game].title;
+  document.getElementById('results-game-name').textContent = level.name + RESULTS_NAME_SEPARATOR + MINI_GAMES[level.game].title;
   document.getElementById('results-unlock-text').textContent = completeLevel(gameState.activeLevelIndex);
   syncProgressUI();
 
