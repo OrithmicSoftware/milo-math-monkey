@@ -21,9 +21,11 @@ const gameState = {
 //  Utility helpers
 // ─────────────────────────────────────────────
 const STORAGE_KEYS = {
+  version: 'miloProgressVersion',
   unlocked: 'miloUnlockedLevelCount',
   completed: 'miloCompletedLevels',
 };
+const STORAGE_VERSION = '1';
 
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -64,6 +66,13 @@ function isNextLevelUnlocked(levelIndex) {
 
 function loadProgress() {
   try {
+    const version = window.localStorage.getItem(STORAGE_KEYS.version);
+    if (version !== STORAGE_VERSION) {
+      gameState.unlockedLevelCount = 1;
+      gameState.completedLevels = [];
+      saveProgress();
+      return;
+    }
     const unlocked = Number(window.localStorage.getItem(STORAGE_KEYS.unlocked)) || 1;
     const completed = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.completed) || '[]');
     gameState.unlockedLevelCount = Math.min(Math.max(unlocked, 1), LEVELS.length);
@@ -78,6 +87,7 @@ function loadProgress() {
 
 function saveProgress() {
   try {
+    window.localStorage.setItem(STORAGE_KEYS.version, STORAGE_VERSION);
     window.localStorage.setItem(STORAGE_KEYS.unlocked, String(gameState.unlockedLevelCount));
     window.localStorage.setItem(STORAGE_KEYS.completed, JSON.stringify(gameState.completedLevels));
   } catch (error) {
@@ -440,7 +450,7 @@ function renderLevelMap() {
     button.type = 'button';
     button.className = 'level-node ' + (completed ? 'completed' : (unlocked ? 'unlocked' : 'locked'));
     button.setAttribute('aria-label', level.name + (unlocked ? '' : ' locked'));
-    button.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
+    button.disabled = !unlocked;
     button.innerHTML =
       '<span class="level-step">' + (levelIndex + 1) + '</span>' +
       '<span class="card-icon">' + level.icon + '</span>' +
@@ -448,13 +458,7 @@ function renderLevelMap() {
       '<div class="card-desc">' + level.description + '</div>' +
       '<span class="card-badge">' + level.badge + '</span>' +
       '<span class="card-status">' + (completed ? 'Cleared ✅' : (unlocked ? 'Ready to play' : 'Locked 🔒')) + '</span>';
-    button.addEventListener('click', () => {
-      if (!unlocked) {
-        playSound('locked');
-        return;
-      }
-      startLevel(levelIndex);
-    });
+    if (unlocked) button.addEventListener('click', () => startLevel(levelIndex));
     mapEl.appendChild(button);
   });
 }
@@ -663,7 +667,7 @@ function playToneSequence(tones) {
     oscillator.frequency.setValueAtTime(tone.freq, startTime);
     gainNode.gain.setValueAtTime(0.0001, startTime);
     gainNode.gain.exponentialRampToValueAtTime(volume, startTime + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+    gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
 
     oscillator.connect(gainNode);
     gainNode.connect(ctx.destination);
