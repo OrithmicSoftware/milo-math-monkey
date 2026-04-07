@@ -351,7 +351,7 @@ function advanceQuestion() {
 function showResults() {
   const pct = gameState.score / gameState.questionsPerRound;
   let stars = '⭐';
-  let msg   = 'Good effort! Keep practising with Milo!';
+  let msg   = 'Good effort! Keep practicing with Milo!';
   if (pct === 1) {
     stars = '⭐⭐⭐';
     msg   = 'PERFECT SCORE! Milo is so proud of you! 🐵🎊';
@@ -419,3 +419,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Start on welcome screen
   showScreen('welcome-screen');
 });
+
+// ─────────────────────────────────────────────
+//  Staging environment banner
+// ─────────────────────────────────────────────
+(function applyEnvBadge() {
+  if (typeof window !== 'undefined' && window.MILO_ENV === 'staging') {
+    const badge = document.getElementById('env-badge');
+    if (badge) badge.style.display = 'block';
+  }
+})();
