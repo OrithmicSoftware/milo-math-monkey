@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Milo the Math Monkey 🐵</title>
+  <meta name="description" content="Count it right… or watch Milo take a tumble! A fun early-learning math game for kids." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       WELCOME SCREEN
+  ══════════════════════════════════════ -->
+  <section id="welcome-screen" class="screen">
+    <div class="logo-badge" aria-label="Milo the monkey hanging from a number 5">🐵</div>
+    <h1 class="game-title">Milo the<br>Math Monkey</h1>
+    <p class="game-slogan">"Count it right… or watch Milo take a tumble!"</p>
+    <div class="number-decoration" aria-hidden="true">1 2 3 4 5</div>
+    <button id="play-btn" class="btn btn-play">🎮 Play!</button>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       MENU SCREEN
+  ══════════════════════════════════════ -->
+  <section id="menu-screen" class="screen">
+    <div class="menu-header">
+      <h2>🐵 Choose a Mini-Game!</h2>
+      <p class="score-display" id="score-display">⭐ Score: 0 / 0</p>
+    </div>
+
+    <div class="games-grid">
+
+      <div class="game-card" data-game="counting" role="button" tabindex="0" aria-label="Counting Chaos game">
+        <div class="card-icon">🎈</div>
+        <div class="card-title">Counting Chaos</div>
+        <div class="card-desc">Count the items before Milo grabs too many balloons and flies away!</div>
+        <span class="card-badge">Counting 1–20</span>
+      </div>
+
+      <div class="game-card" data-game="measuring" role="button" tabindex="0" aria-label="Measuring Mayhem game">
+        <div class="card-icon">📏</div>
+        <div class="card-title">Measuring Mayhem</div>
+        <div class="card-desc">Get it wrong and Milo falls face-first into the jelly!</div>
+        <span class="card-badge">Size &amp; Comparison</span>
+      </div>
+
+      <div class="game-card" data-game="sharing" role="button" tabindex="0" aria-label="Sharing Snacks game">
+        <div class="card-icon">🍌</div>
+        <div class="card-title">Sharing Snacks</div>
+        <div class="card-desc">Wrong division and the characters roll away with ALL the snacks!</div>
+        <span class="card-badge">Add, Subtract &amp; Share</span>
+      </div>
+
+      <div class="game-card" data-game="weight" role="button" tabindex="0" aria-label="Weight Trouble game">
+        <div class="card-icon">⚖️</div>
+        <div class="card-title">Weight Trouble</div>
+        <div class="card-desc">Wrong weight comparison launches Milo off the seesaw — BOING!</div>
+        <span class="card-badge">Heavier &amp; Lighter</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       GAME SCREEN
+  ══════════════════════════════════════ -->
+  <section id="game-screen" class="screen">
+
+    <div class="game-header">
+      <h2 id="game-title-label">Game Title</h2>
+      <span class="question-counter" id="question-counter">Q 1 / 5</span>
+    </div>
+
+    <!-- Milo + question scene -->
+    <div class="milo-stage">
+      <span id="milo-char" class="milo-character" aria-label="Milo the monkey">🐵</span>
+      <div class="question-scene" id="question-scene"></div>
+      <p class="question-text" id="question-text"></p>
+    </div>
+
+    <!-- Answer choices -->
+    <div class="answers-grid" id="answers-grid" role="group" aria-label="Answer choices"></div>
+
+    <!-- Feedback -->
+    <div class="feedback-banner" id="feedback-banner" role="alert" aria-live="polite"></div>
+
+    <!-- Navigation -->
+    <button id="next-btn" class="btn btn-next" style="display:none; margin-top:14px;">Next Question ➡️</button>
+    <button id="back-to-menu-btn" class="btn btn-back">⬅ Back to Menu</button>
+
+  </section>
+
+  <!-- ══════════════════════════════════════
+       RESULTS SCREEN
+  ══════════════════════════════════════ -->
+  <section id="results-screen" class="screen">
+    <div class="results-milo" aria-label="Milo celebrating">🐵</div>
+    <h2 class="results-title">Round Complete!</h2>
+    <p class="results-score" id="results-score-text"></p>
+    <p class="results-game-name" id="results-game-name" style="color:#888; font-size:.95rem; margin-bottom:10px;"></p>
+    <div class="stars" id="results-stars" aria-label="Stars earned">⭐</div>
+    <p class="results-msg" id="results-msg"></p>
+    <div class="btn-row">
+      <button id="play-again-btn" class="btn btn-primary">🔄 Play Again</button>
+      <button id="choose-game-btn" class="btn btn-success">🎮 Choose Game</button>
+    </div>
+  </section>
+
+  <!-- Environment badge – shown only in staging (set by config.js + game.js) -->
+  <div id="env-badge" style="display:none; position:fixed; top:0; left:0; right:0;
+       background:#FF4081; color:#fff; text-align:center; padding:6px 0; font-size:.9rem;
+       font-family: 'Comic Sans MS', cursive; z-index:9999; letter-spacing:1px;">
+    🚧 STAGING ENVIRONMENT — not for production use 🚧
+  </div>
+
+  <script src="config.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
