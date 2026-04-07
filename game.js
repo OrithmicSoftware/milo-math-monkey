@@ -64,6 +64,13 @@ function isNextLevelUnlocked(levelIndex) {
   return hasNextLevel(levelIndex) && levelIndex + 1 < gameState.unlockedLevelCount;
 }
 
+function syncProgressUI() {
+  saveProgress();
+  updateScoreDisplay();
+  updateMapProgressText();
+  renderLevelMap();
+}
+
 function loadProgress() {
   try {
     const version = window.localStorage.getItem(STORAGE_KEYS.version);
@@ -95,7 +102,7 @@ function saveProgress() {
   }
 }
 
-function markLevelComplete(levelIndex) {
+function completeLevel(levelIndex) {
   if (!gameState.completedLevels.includes(levelIndex)) {
     gameState.completedLevels.push(levelIndex);
     gameState.completedLevels.sort((a, b) => a - b);
@@ -109,10 +116,6 @@ function markLevelComplete(levelIndex) {
     unlockMessage = 'New level unlocked: ' + LEVELS[nextLevelIndex].name + '!';
   }
 
-  saveProgress();
-  updateScoreDisplay();
-  updateMapProgressText();
-  renderLevelMap();
   return unlockMessage;
 }
 
@@ -148,7 +151,7 @@ function makeCountingQuestion(level) {
   const correct = count;
 
   const distractors = new Set();
-  const maxChoiceLimit = Math.max(maxCount + distractorRange + 2, MAX_COUNTING_LIMIT);
+  const maxChoiceLimit = Math.min(maxCount + Math.max(distractorRange, 2), MAX_COUNTING_LIMIT);
   while (distractors.size < 3) {
     const d = correct + randInt(-distractorRange, distractorRange);
     if (d !== correct && d >= 1 && d <= maxChoiceLimit) distractors.add(d);
@@ -188,13 +191,15 @@ function makeMeasuringQuestion(level) {
 
   if (level.includeThirdChoice) {
     let decoy = correct;
-    while (choices.includes(decoy)) {
+    let attempts = 0;
+    while (choices.includes(decoy) && attempts < 20) {
       const extraPair = randomFrom(MEASURE_PAIRS);
       decoy = Math.random() < 0.5
         ? extraPair.a.emoji + ' ' + extraPair.a.label
         : extraPair.b.emoji + ' ' + extraPair.b.label;
+      attempts++;
     }
-    choices.push(decoy);
+    if (!choices.includes(decoy)) choices.push(decoy);
   }
 
   return {
@@ -290,13 +295,15 @@ function makeWeightQuestion(level) {
 
   if (level.includeThirdChoice) {
     let decoy = correct;
-    while (choices.includes(decoy)) {
+    let attempts = 0;
+    while (choices.includes(decoy) && attempts < 20) {
       const extraPair = randomFrom(WEIGHT_PAIRS);
       decoy = Math.random() < 0.5
         ? extraPair.a.emoji + ' ' + extraPair.a.label
         : extraPair.b.emoji + ' ' + extraPair.b.label;
+      attempts++;
     }
-    choices.push(decoy);
+    if (!choices.includes(decoy)) choices.push(decoy);
   }
 
   return {
@@ -603,7 +610,8 @@ function showResults() {
   document.getElementById('results-stars').textContent = stars;
   document.getElementById('results-msg').textContent = msg;
   document.getElementById('results-game-name').textContent = level.name + ' • ' + MINI_GAMES[level.game].title;
-  document.getElementById('results-unlock-text').textContent = markLevelComplete(gameState.activeLevelIndex);
+  document.getElementById('results-unlock-text').textContent = completeLevel(gameState.activeLevelIndex);
+  syncProgressUI();
 
   const nextLevelBtn = document.getElementById('next-level-btn');
   if (isNextLevelUnlocked(gameState.activeLevelIndex)) {
@@ -642,7 +650,11 @@ function getAudioContext() {
   if (!AudioCtx) return null;
   if (!audioContext) audioContext = new AudioCtx();
   if (audioContext.state === 'suspended') {
-    audioContext.resume().catch(() => {});
+    audioContext.resume().catch(error => {
+      if (typeof console !== 'undefined' && console.warn) {
+        console.warn('Unable to resume Milo audio context.', error);
+      }
+    });
   }
   return audioContext;
 }
@@ -722,9 +734,7 @@ function playSound(effect) {
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   loadProgress();
-  updateScoreDisplay();
-  updateMapProgressText();
-  renderLevelMap();
+  syncProgressUI();
 
   // Welcome → Menu
   document.getElementById('play-btn').addEventListener('click', () => {

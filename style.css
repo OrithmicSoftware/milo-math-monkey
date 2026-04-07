@@ -136,7 +136,6 @@ body {
   transition: transform .2s, border-color .2s, box-shadow .2s, opacity .2s;
   position: relative;
 }
-.level-node:nth-child(even) { transform: translateY(20px); }
 .level-node:hover:not(:disabled) {
   transform: translateY(-6px) rotate(1deg);
   border-color: var(--yellow);
@@ -360,5 +359,4 @@ body {
   .answers-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .level-map    { grid-template-columns: 1fr 1fr; }
   .answer-btn   { padding: 14px 8px; }
-  .level-node:nth-child(even) { transform: none; }
 }
