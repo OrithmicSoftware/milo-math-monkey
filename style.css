@@ -384,6 +384,24 @@ body {
 .seesaw-pivot { display: flex; flex-direction: column; align-items: center; }
 
 /* ── Responsive ── */
+@media (max-width: 900px) and (min-width: 481px) {
+  .games-grid { min-height: 520px; }
+  .game-card {
+    width: 160px;
+    min-height: 112px;
+  }
+  .level-1 { left: 6%;  top: 62%; }
+  .level-2 { left: 20%; top: 33%; }
+  .level-3 { left: 47%; top: 20%; }
+  .level-4 { left: 68%; top: 44%; }
+  .treasure-island {
+    right: 5%;
+    top: 8%;
+    width: 110px;
+    height: 86px;
+  }
+}
+
 @media (max-width: 480px) {
   .answers-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .games-grid   { min-height: 620px; }
@@ -408,6 +426,6 @@ body {
     left: 14%;
     right: 14%;
     top: 50%;
-    transform: rotate(80deg);
+    transform: rotate(22deg);
   }
 }
