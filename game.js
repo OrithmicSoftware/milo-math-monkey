@@ -315,6 +315,7 @@ function handleAnswer(chosen) {
 
   // Milo animation
   const miloEl = document.getElementById('milo-char');
+  // Keep legacy per-game wrong animations while defaulting to generic failure.
   playMiloAnimation(miloEl, isCorrect ? 'success' : (q.wrongAnim || 'failure'));
 
   if (isCorrect) gameState.score++;
