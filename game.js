@@ -5,6 +5,7 @@
 // ─────────────────────────────────────────────
 const gameState = {
   activeGame: null,
+  activeLevelIndex: 0,
   score: 0,
   totalAnswered: 0,
   questionsPerRound: 5,
@@ -12,11 +13,22 @@ const gameState = {
   questions: [],
   currentQ: null,
   answered: false,
+  unlockedLevelCount: 1,
+  completedLevels: [],
 };
 
 // ─────────────────────────────────────────────
 //  Utility helpers
 // ─────────────────────────────────────────────
+const STORAGE_KEYS = {
+  version: 'miloProgressVersion',
+  unlocked: 'miloUnlockedLevelCount',
+  completed: 'miloCompletedLevels',
+};
+const STORAGE_VERSION = '1';
+const MAX_DECOY_ATTEMPTS = 20;
+const RESULTS_NAME_SEPARATOR = ' - ';
+
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -32,6 +44,81 @@ function shuffle(arr) {
 
 function repeat(char, n) {
   return Array(n).fill(char).join(' ');
+}
+
+function randomFrom(arr) {
+  return arr[randInt(0, arr.length - 1)];
+}
+
+function getLevel(levelIndex) {
+  return LEVELS[levelIndex];
+}
+
+function getCurrentLevel() {
+  return getLevel(gameState.activeLevelIndex);
+}
+
+function hasNextLevel(levelIndex) {
+  return levelIndex + 1 < LEVELS.length;
+}
+
+function isNextLevelUnlocked(levelIndex) {
+  return hasNextLevel(levelIndex) && levelIndex + 1 < gameState.unlockedLevelCount;
+}
+
+function syncProgressUI() {
+  saveProgress();
+  updateScoreDisplay();
+  updateMapProgressText();
+  renderLevelMap();
+}
+
+function loadProgress() {
+  try {
+    const version = window.localStorage.getItem(STORAGE_KEYS.version);
+    if (version !== STORAGE_VERSION) {
+      gameState.unlockedLevelCount = 1;
+      gameState.completedLevels = [];
+      saveProgress();
+      return;
+    }
+    const unlocked = Number(window.localStorage.getItem(STORAGE_KEYS.unlocked)) || 1;
+    const completed = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.completed) || '[]');
+    gameState.unlockedLevelCount = Math.min(Math.max(unlocked, 1), LEVELS.length);
+    gameState.completedLevels = Array.isArray(completed)
+      ? completed.filter(levelIndex => Number.isInteger(levelIndex) && levelIndex >= 0 && levelIndex < LEVELS.length)
+      : [];
+  } catch (error) {
+    gameState.unlockedLevelCount = 1;
+    gameState.completedLevels = [];
+  }
+}
+
+function saveProgress() {
+  try {
+    window.localStorage.setItem(STORAGE_KEYS.version, STORAGE_VERSION);
+    window.localStorage.setItem(STORAGE_KEYS.unlocked, String(gameState.unlockedLevelCount));
+    window.localStorage.setItem(STORAGE_KEYS.completed, JSON.stringify(gameState.completedLevels));
+  } catch (error) {
+    // Ignore storage issues so the game still works in restricted browsers.
+  }
+}
+
+function completeLevel(levelIndex) {
+  if (!gameState.completedLevels.includes(levelIndex)) {
+    gameState.completedLevels.push(levelIndex);
+    gameState.completedLevels.sort((a, b) => a - b);
+  }
+
+  let unlockMessage = 'You cleared this level! Replay it anytime for more stars.';
+  const nextLevelIndex = levelIndex + 1;
+  if (hasNextLevel(levelIndex) && gameState.unlockedLevelCount <= nextLevelIndex) {
+    gameState.unlockedLevelCount = nextLevelIndex + 1;
+    playSound('unlock');
+    unlockMessage = 'New level unlocked: ' + LEVELS[nextLevelIndex].name + '!';
+  }
+
+  return unlockMessage;
 }
 
 // ─────────────────────────────────────────────
@@ -55,16 +142,21 @@ const COUNTING_ITEMS = [
   { emoji: '🍎', name: 'apples'   },
   { emoji: '🌸', name: 'flowers'  },
 ];
+const MAX_COUNTING_LIMIT = 25;
 
-function makeCountingQuestion() {
+function makeCountingQuestion(level) {
   const item  = COUNTING_ITEMS[randInt(0, COUNTING_ITEMS.length - 1)];
-  const count = randInt(1, 20);
+  const minCount = level.minCount || 1;
+  const maxCount = level.maxCount || 20;
+  const distractorRange = level.distractorRange || 4;
+  const count = randInt(minCount, maxCount);
   const correct = count;
 
   const distractors = new Set();
+  const maxChoiceLimit = Math.min(maxCount + Math.max(distractorRange, 2), MAX_COUNTING_LIMIT);
   while (distractors.size < 3) {
-    const d = correct + randInt(-4, 4);
-    if (d !== correct && d >= 1 && d <= 25) distractors.add(d);
+    const d = correct + randInt(-distractorRange, distractorRange);
+    if (d !== correct && d >= 1 && d <= maxChoiceLimit) distractors.add(d);
   }
 
   return {
@@ -91,13 +183,26 @@ const MEASURE_PAIRS = [
   { a: { emoji: '🌞', label: 'the sun'      }, b: { emoji: '🌙', label: 'the moon'          } },
 ];
 
-function makeMeasuringQuestion() {
+function makeMeasuringQuestion(level) {
   const pair     = MEASURE_PAIRS[randInt(0, MEASURE_PAIRS.length - 1)];
   const askBig   = Math.random() < 0.5;
   const bigLabel = pair.a.emoji + ' ' + pair.a.label;
   const smlLabel = pair.b.emoji + ' ' + pair.b.label;
   const correct  = askBig ? bigLabel : smlLabel;
-  const choices  = shuffle([bigLabel, smlLabel]);
+  const choices  = [bigLabel, smlLabel];
+
+  if (level.includeThirdChoice) {
+    let decoy = correct;
+    let attempts = 0;
+    while (choices.includes(decoy) && attempts < MAX_DECOY_ATTEMPTS) {
+      const extraPair = randomFrom(MEASURE_PAIRS);
+      decoy = Math.random() < 0.5
+        ? extraPair.a.emoji + ' ' + extraPair.a.label
+        : extraPair.b.emoji + ' ' + extraPair.b.label;
+      attempts++;
+    }
+    if (!choices.includes(decoy)) choices.push(decoy);
+  }
 
   return {
     type: 'measuring',
@@ -106,7 +211,7 @@ function makeMeasuringQuestion() {
       ? 'Which is BIGGER: ' + pair.a.label + ' or ' + pair.b.label + '?'
       : 'Which is SMALLER: ' + pair.a.label + ' or ' + pair.b.label + '?',
     correct,
-    choices,
+    choices: shuffle(choices),
     wrongAnim: 'fall',
     wrongMsg: 'Oops! Milo measured wrong and fell into the jelly! 🫙💥',
     correctMsg: 'Perfect measuring! Milo stays dry! 📏🐵✨',
@@ -122,19 +227,23 @@ const SNACK_ITEMS = [
   { emoji: '🍬', name: 'candies' },
 ];
 
-function makeSharingQuestion() {
+function makeSharingQuestion(level) {
   const item  = SNACK_ITEMS[randInt(0, SNACK_ITEMS.length - 1)];
   const mode  = randInt(0, 1); // 0=addition  1=subtraction
 
   let question, correct, scene;
+  const additionRange = level.additionRange || [1, 10];
+  const subtractionTotalRange = level.subtractionTotalRange || [3, 15];
 
   if (mode === 0) {
-    const a = randInt(1, 10), b = randInt(1, 10);
+    const a = randInt(additionRange[0], additionRange[1]);
+    const b = randInt(additionRange[0], additionRange[1]);
     correct  = a + b;
     scene    = repeat(item.emoji, a) + '  ➕  ' + repeat(item.emoji, b);
     question = 'Milo has ' + a + ' ' + item.name + ', then finds ' + b + ' more. How many altogether?';
   } else if (mode === 1) {
-    const total = randInt(3, 15), eaten = randInt(1, total - 1);
+    const total = randInt(subtractionTotalRange[0], subtractionTotalRange[1]);
+    const eaten = randInt(1, total - 1);
     correct  = total - eaten;
     scene    = repeat(item.emoji, total);
     question = 'Milo has ' + total + ' ' + item.name + ' and eats ' + eaten + '. How many are left?';
@@ -169,13 +278,26 @@ const WEIGHT_PAIRS = [
   { a: { emoji: '🦁', label: 'a lion'           }, b: { emoji: '🐹', label: 'a hamster'        } },
 ];
 
-function makeWeightQuestion() {
+function makeWeightQuestion(level) {
   const pair      = WEIGHT_PAIRS[randInt(0, WEIGHT_PAIRS.length - 1)];
   const askHeavy  = Math.random() < 0.5;
   const heavyLabel = pair.a.emoji + ' ' + pair.a.label;
   const lightLabel = pair.b.emoji + ' ' + pair.b.label;
   const correct    = askHeavy ? heavyLabel : lightLabel;
-  const choices    = shuffle([heavyLabel, lightLabel]);
+  const choices    = [heavyLabel, lightLabel];
+
+  if (level.includeThirdChoice) {
+    let decoy = correct;
+    let attempts = 0;
+    while (choices.includes(decoy) && attempts < MAX_DECOY_ATTEMPTS) {
+      const extraPair = randomFrom(WEIGHT_PAIRS);
+      decoy = Math.random() < 0.5
+        ? extraPair.a.emoji + ' ' + extraPair.a.label
+        : extraPair.b.emoji + ' ' + extraPair.b.label;
+      attempts++;
+    }
+    if (!choices.includes(decoy)) choices.push(decoy);
+  }
 
   return {
     type: 'weight',
@@ -186,7 +308,7 @@ function makeWeightQuestion() {
       ? 'Which is HEAVIER: ' + pair.a.label + ' or ' + pair.b.label + '?'
       : 'Which is LIGHTER: ' + pair.a.label + ' or ' + pair.b.label + '?',
     correct,
-    choices,
+    choices: shuffle(choices),
     wrongAnim: 'launch',
     wrongMsg: 'BOING! Wrong weight — Milo got launched off the seesaw! 🪂',
     correctMsg: 'The seesaw balances! Great thinking! ⚖️🐵🎊',
@@ -203,12 +325,95 @@ const MINI_GAMES = {
   weight:   { title: 'Weight Trouble ⚖️',   makeQuestion: makeWeightQuestion    },
 };
 
+const LEVELS = [
+  {
+    name: 'Level 1 · Balloon Trail',
+    game: 'counting',
+    icon: '🎈',
+    badge: 'Count 1–10',
+    description: 'Warm up by counting Milo’s first balloon bundles.',
+    questionsPerRound: 5,
+    minCount: 1,
+    maxCount: 10,
+    distractorRange: 2,
+  },
+  {
+    name: 'Level 2 · Giant or Tiny',
+    game: 'measuring',
+    icon: '📏',
+    badge: 'Big / Small',
+    description: 'Pick the bigger or smaller thing on Milo’s trail.',
+    questionsPerRound: 5,
+  },
+  {
+    name: 'Level 3 · Snack Split',
+    game: 'sharing',
+    icon: '🍌',
+    badge: 'Easy Sums',
+    description: 'Share Milo’s snacks with tiny totals and easy math.',
+    questionsPerRound: 5,
+    additionRange: [1, 6],
+    subtractionTotalRange: [4, 10],
+    sharingFriendsRange: [2, 3],
+    sharingPerFriendRange: [1, 4],
+  },
+  {
+    name: 'Level 4 · Seesaw Start',
+    game: 'weight',
+    icon: '⚖️',
+    badge: 'Heavy / Light',
+    description: 'Balance the jungle seesaw with simple weight picks.',
+    questionsPerRound: 5,
+  },
+  {
+    name: 'Level 5 · Counting Canopy',
+    game: 'counting',
+    icon: '🌴',
+    badge: 'Count 6–18',
+    description: 'Count bigger bunches before Milo floats into the canopy.',
+    questionsPerRound: 6,
+    minCount: 6,
+    maxCount: 18,
+    distractorRange: 4,
+  },
+  {
+    name: 'Level 6 · Size Safari',
+    game: 'measuring',
+    icon: '🦒',
+    badge: 'Extra Choice',
+    description: 'A trickier size challenge with one extra silly answer.',
+    questionsPerRound: 6,
+    includeThirdChoice: true,
+  },
+  {
+    name: 'Level 7 · Banana Bonanza',
+    game: 'sharing',
+    icon: '🍌',
+    badge: 'Bigger Math',
+    description: 'Solve larger addition, subtraction, and sharing puzzles.',
+    questionsPerRound: 6,
+    additionRange: [3, 12],
+    subtractionTotalRange: [8, 18],
+    sharingFriendsRange: [2, 5],
+    sharingPerFriendRange: [2, 6],
+  },
+  {
+    name: 'Level 8 · Monkey Master',
+    game: 'weight',
+    icon: '🏆',
+    badge: 'Expert Picks',
+    description: 'Milo’s final weight challenge adds another answer to dodge.',
+    questionsPerRound: 7,
+    includeThirdChoice: true,
+  },
+];
+
 // ─────────────────────────────────────────────
 //  Build a round of questions
 // ─────────────────────────────────────────────
-function buildRound(gameKey) {
-  const mk = MINI_GAMES[gameKey].makeQuestion;
-  return Array.from({ length: gameState.questionsPerRound }, () => mk());
+function buildRound(level) {
+  const mk = MINI_GAMES[level.game].makeQuestion;
+  return Array.from({ length: gameState.questionsPerRound }, () => mk(level));
 }
 
 // ─────────────────────────────────────────────
@@ -216,7 +421,46 @@ function buildRound(gameKey) {
 // ─────────────────────────────────────────────
 function updateScoreDisplay() {
   document.getElementById('score-display').textContent =
-    '⭐ Score: ' + gameState.score + ' / ' + gameState.totalAnswered;
+    '⭐ Levels Cleared: ' + gameState.completedLevels.length + ' / ' + LEVELS.length;
+}
+
+function updateMapProgressText() {
+  const progressText = document.getElementById('map-progress-text');
+  if (!progressText) return;
+
+  if (gameState.completedLevels.length >= LEVELS.length) {
+    progressText.textContent = 'Amazing! You unlocked every stop on Milo’s jungle map!';
+    return;
+  }
+
+  const nextLevel = LEVELS[Math.max(gameState.unlockedLevelCount - 1, 0)];
+  progressText.textContent = 'Next jungle stop: ' + nextLevel.name + '. Tap any unlocked level to play!';
+}
+
+function renderLevelMap() {
+  const mapEl = document.getElementById('level-map');
+  if (!mapEl) return;
+
+  mapEl.innerHTML = '';
+
+  LEVELS.forEach((level, levelIndex) => {
+    const unlocked = levelIndex < gameState.unlockedLevelCount;
+    const completed = gameState.completedLevels.includes(levelIndex);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'level-node ' + (completed ? 'completed' : (unlocked ? 'unlocked' : 'locked'));
+    button.setAttribute('aria-label', level.name + (unlocked ? '' : ' locked'));
+    button.disabled = !unlocked;
+    button.innerHTML =
+      '<span class="level-step">' + (levelIndex + 1) + '</span>' +
+      '<span class="card-icon">' + level.icon + '</span>' +
+      '<div class="card-title">' + level.name + '</div>' +
+      '<div class="card-desc">' + level.description + '</div>' +
+      '<span class="card-badge">' + level.badge + '</span>' +
+      '<span class="card-status">' + (completed ? 'Cleared ✅' : (unlocked ? 'Ready to play' : 'Locked 🔒')) + '</span>';
+    if (unlocked) button.addEventListener('click', () => startLevel(levelIndex));
+    mapEl.appendChild(button);
+  });
 }
 
 // ─────────────────────────────────────────────
@@ -306,7 +550,7 @@ function handleAnswer(chosen) {
   miloEl.classList.add(isCorrect ? 'celebrate' : (q.wrongAnim || 'tumble'));
 
   if (isCorrect) gameState.score++;
-  updateScoreDisplay();
+  playSound(isCorrect ? 'correct' : 'wrong');
 
   // Feedback
   const fb = document.getElementById('feedback-banner');
@@ -342,6 +586,7 @@ function advanceQuestion() {
 //  Show results screen
 // ─────────────────────────────────────────────
 function showResults() {
+  const level = getCurrentLevel();
   const pct = gameState.score / gameState.questionsPerRound;
   let stars = '⭐';
   let msg   = 'Good effort! Keep practicing with Milo!';
@@ -357,55 +602,172 @@ function showResults() {
     'You got ' + gameState.score + ' out of ' + gameState.questionsPerRound + ' correct!';
   document.getElementById('results-stars').textContent = stars;
   document.getElementById('results-msg').textContent = msg;
-  document.getElementById('results-game-name').textContent = MINI_GAMES[gameState.activeGame].title;
+  document.getElementById('results-game-name').textContent = level.name + RESULTS_NAME_SEPARATOR + MINI_GAMES[level.game].title;
+  document.getElementById('results-unlock-text').textContent = completeLevel(gameState.activeLevelIndex);
+  syncProgressUI();
+
+  const nextLevelBtn = document.getElementById('next-level-btn');
+  if (isNextLevelUnlocked(gameState.activeLevelIndex)) {
+    nextLevelBtn.style.display = 'inline-block';
+  } else {
+    nextLevelBtn.style.display = 'none';
+  }
   showScreen('results-screen');
 }
 
 // ─────────────────────────────────────────────
 //  Start a mini-game
 // ─────────────────────────────────────────────
-function startGame(gameKey) {
-  gameState.activeGame    = gameKey;
+function startLevel(levelIndex) {
+  const level = getLevel(levelIndex);
+  gameState.activeLevelIndex = levelIndex;
+  gameState.activeGame    = level.game;
   gameState.score         = 0;
   gameState.totalAnswered = 0;
+  gameState.questionsPerRound = level.questionsPerRound || 5;
   gameState.questionIndex = 0;
-  gameState.questions     = buildRound(gameKey);
+  gameState.questions     = buildRound(level);
   gameState.currentQ      = gameState.questions[0];
-  updateScoreDisplay();
+  playSound('start');
   showScreen('game-screen');
   renderQuestion();
+}
+
+// ─────────────────────────────────────────────
+//  Browser sound effects
+// ─────────────────────────────────────────────
+let audioContext = null;
+
+function getAudioContext() {
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return null;
+  if (!audioContext) audioContext = new AudioCtx();
+  if (audioContext.state === 'suspended') {
+    audioContext.resume().catch(error => {
+      if (typeof console !== 'undefined' && console.warn) {
+        console.warn('Unable to resume Milo audio context.', error);
+      }
+    });
+  }
+  return audioContext;
+}
+
+/**
+ * Play a short sequence of synthesized tones.
+ * @param {Array<{freq:number, duration?:number, type?:OscillatorType, volume?:number, gap?:number}>} tones
+ *   Tone descriptors used to build a playful sound effect.
+ */
+function playToneSequence(tones) {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  let startTime = ctx.currentTime + 0.01;
+  tones.forEach(tone => {
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    const duration = tone.duration || 0.12;
+    const volume = tone.volume || 0.06;
+
+    oscillator.type = tone.type || 'sine';
+    oscillator.frequency.setValueAtTime(tone.freq, startTime);
+    gainNode.gain.setValueAtTime(0.0001, startTime);
+    gainNode.gain.exponentialRampToValueAtTime(volume, startTime + 0.01);
+    gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    oscillator.start(startTime);
+    oscillator.stop(startTime + duration + 0.02);
+
+    startTime += duration + (tone.gap || 0.04);
+  });
+}
+
+/**
+ * Play one of the built-in UI sound effects.
+ * Valid effects: click, start, correct, wrong, unlock, locked.
+ * @param {string} effect
+ */
+function playSound(effect) {
+  const sounds = {
+    click: [
+      { freq: 520, duration: 0.05, type: 'triangle', volume: 0.03 },
+      { freq: 660, duration: 0.05, type: 'triangle', volume: 0.03 },
+    ],
+    start: [
+      { freq: 330, duration: 0.06, type: 'square', volume: 0.04 },
+      { freq: 440, duration: 0.06, type: 'square', volume: 0.04 },
+      { freq: 554, duration: 0.08, type: 'triangle', volume: 0.05 },
+    ],
+    correct: [
+      { freq: 523, duration: 0.08, type: 'triangle' },
+      { freq: 659, duration: 0.08, type: 'triangle' },
+      { freq: 784, duration: 0.12, type: 'sine' },
+    ],
+    wrong: [
+      { freq: 280, duration: 0.09, type: 'sawtooth', volume: 0.05 },
+      { freq: 220, duration: 0.14, type: 'sawtooth', volume: 0.05 },
+    ],
+    unlock: [
+      { freq: 440, duration: 0.06, type: 'triangle' },
+      { freq: 660, duration: 0.06, type: 'triangle' },
+      { freq: 880, duration: 0.16, type: 'sine', volume: 0.08 },
+    ],
+    locked: [
+      { freq: 190, duration: 0.08, type: 'square', volume: 0.04 },
+      { freq: 150, duration: 0.08, type: 'square', volume: 0.04 },
+    ],
+  };
+
+  if (sounds[effect]) playToneSequence(sounds[effect]);
 }
 
 // ─────────────────────────────────────────────
 //  DOM ready
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  loadProgress();
+  syncProgressUI();
 
   // Welcome → Menu
   document.getElementById('play-btn').addEventListener('click', () => {
+    playSound('click');
     showScreen('menu-screen');
   });
 
-  // Menu → mini-games
-  document.querySelectorAll('.game-card').forEach(card => {
-    card.addEventListener('click', () => startGame(card.dataset.game));
-  });
-
   // Next / Finish button
-  document.getElementById('next-btn').addEventListener('click', advanceQuestion);
+  document.getElementById('next-btn').addEventListener('click', () => {
+    playSound('click');
+    advanceQuestion();
+  });
 
   // Back to menu from game
   document.getElementById('back-to-menu-btn').addEventListener('click', () => {
+    playSound('click');
+    updateMapProgressText();
+    renderLevelMap();
     showScreen('menu-screen');
   });
 
   // Results → play same game again
   document.getElementById('play-again-btn').addEventListener('click', () => {
-    startGame(gameState.activeGame);
+    playSound('click');
+    startLevel(gameState.activeLevelIndex);
+  });
+
+  // Results → next level
+  document.getElementById('next-level-btn').addEventListener('click', () => {
+    playSound('click');
+    if (isNextLevelUnlocked(gameState.activeLevelIndex)) {
+      startLevel(gameState.activeLevelIndex + 1);
+    }
   });
 
   // Results → choose another game
   document.getElementById('choose-game-btn').addEventListener('click', () => {
+    playSound('click');
+    updateMapProgressText();
+    renderLevelMap();
     showScreen('menu-screen');
   });
 
