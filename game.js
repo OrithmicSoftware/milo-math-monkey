@@ -78,6 +78,8 @@ const I18N = {
       measuringCorrect: 'Perfect measuring! Milo stays dry! 📏🐵✨',
       sharingWrong: 'Uh oh! Wrong share! The friends rolled away with ALL the snacks! 🍌🎲',
       sharingCorrect: 'Sharing is caring! Everyone gets their snacks! 🐵🍌🎉',
+      whoMoreWrong: 'Oops! Milo guessed wrong and slipped on snack crumbs! 🍪💥',
+      whoMoreCorrect: 'Nice comparing! You spotted who has more! 🐵✅',
       weightWrong: 'BOING! Wrong weight — Milo got launched off the seesaw! 🪂',
       weightCorrect: 'The seesaw balances! Great thinking! ⚖️🐵🎊',
     },
@@ -146,6 +148,8 @@ const I18N = {
       measuringCorrect: 'Отлично измерено! Мило сухой и довольный! 📏🐵✨',
       sharingWrong: 'Ой-ой! Неправильно поделили — друзья укатили со всеми вкусняшками! 🍌🎲',
       sharingCorrect: 'Делиться — это здорово! Всем достались угощения! 🐵🍌🎉',
+      whoMoreWrong: 'Упс! Неправильно — Мило поскользнулся на крошках! 🍪💥',
+      whoMoreCorrect: 'Отличное сравнение! Ты нашёл, у кого больше! 🐵✅',
       weightWrong: 'БУМ! Ошибка в весе — Мило улетел с качелей! 🪂',
       weightCorrect: 'Качели в равновесии! Отличное мышление! ⚖️🐵🎊',
     },
@@ -214,6 +218,8 @@ const I18N = {
       measuringCorrect: 'מדידה מושלמת! מילו נשאר יבש! 📏🐵✨',
       sharingWrong: 'אוי! חילוק לא נכון — החברים התגלגלו עם כל החטיפים! 🍌🎲',
       sharingCorrect: 'לחלק זה כיף! לכולם יש חטיפים! 🐵🍌🎉',
+      whoMoreWrong: 'אופס! טעות — מילו החליק על פירורי חטיפים! 🍪💥',
+      whoMoreCorrect: 'השוואה מעולה! מצאת למי יש יותר! 🐵✅',
       weightWrong: 'בווינג! טעות במשקל — מילו נזרק מהנדנדה! 🪂',
       weightCorrect: 'הנדנדה מאוזנת! חשיבה נהדרת! ⚖️🐵🎊',
     },
@@ -282,6 +288,8 @@ const I18N = {
       measuringCorrect: 'قياس رائع! ميلو بقي جافًا! 📏🐵✨',
       sharingWrong: 'يا إلهي! تقاسم خاطئ — الأصدقاء تدحرجوا مع كل الوجبات! 🍌🎲',
       sharingCorrect: 'المشاركة رائعة! الجميع حصل على وجبته! 🐵🍌🎉',
+      whoMoreWrong: 'أوبس! تخمين خاطئ — انزلق ميلو على فتات الوجبات! 🍪💥',
+      whoMoreCorrect: 'مقارنة رائعة! عرفتَ مَن لديه أكثر! 🐵✅',
       weightWrong: 'بويـنغ! مقارنة وزن خاطئة — انطلق ميلو من الأرجوحة! 🪂',
       weightCorrect: 'الأرجوحة متوازنة! تفكير ممتاز! ⚖️🐵🎊',
     },
@@ -566,11 +574,11 @@ function makeSharingQuestion() {
 
 /* ── 4. Who Has More? ──────────────────────── */
 const WHO_HAS_MORE_FRIENDS = [
-  { emoji: '🦊', name: 'Fifi the fox' },
-  { emoji: '🐼', name: 'Poppy the panda' },
-  { emoji: '🐸', name: 'Freddy the frog' },
-  { emoji: '🐻', name: 'Bobo the bear' },
-  { emoji: '🐧', name: 'Pip the penguin' },
+  { emoji: '🦊' },
+  { emoji: '🐼' },
+  { emoji: '🐸' },
+  { emoji: '🐻' },
+  { emoji: '🐧' },
 ];
 
 function makeWhoHasMoreQuestion() {
@@ -582,7 +590,9 @@ function makeWhoHasMoreQuestion() {
   let friendCount = randInt(2, 12);
   while (friendCount === miloCount) friendCount = randInt(2, 12);
 
-  const correct = miloCount > friendCount ? 'Milo' : friend.name;
+  const miloChoice = '🐵';
+  const friendChoice = friend.emoji;
+  const correct = miloCount > friendCount ? miloChoice : friendChoice;
 
   return {
     type: 'who-has-more',
@@ -590,10 +600,10 @@ function makeWhoHasMoreQuestion() {
            friend.emoji + ' ' + repeat(item.emoji, friendCount),
     question: t('questions.whoHasMore', { item: itemName }),
     correct,
-    choices: shuffle(['Milo', friend.name]),
+    choices: shuffle([miloChoice, friendChoice]),
     wrongAnim: 'fall',
-    wrongMsg: 'Oops! Milo guessed wrong and slipped on snack crumbs! 🍪💥',
-    correctMsg: 'Nice comparing! You spotted who has more! 🐵✅',
+    wrongMsg: t('feedback.whoMoreWrong'),
+    correctMsg: t('feedback.whoMoreCorrect'),
   };
 }
 
