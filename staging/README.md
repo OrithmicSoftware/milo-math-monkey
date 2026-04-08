@@ -48,16 +48,7 @@ open index.html
 start index.html
 ```
 
-## 🎨 Character Concept Prototype
-
-A separate browser prototype for Milo's visual direction is available at `character.html`.
-It includes:
-
-- a standalone SVG Milo inspired by the provided monkey reference art
-- lightweight idle / reach / celebration motion loops suitable for browser gameplay
-- a small funny-sound board built with the Web Audio API
-
-Open `character.html` from the project root to preview the character concept on its own.
+Language can also be selected from the URL path when hosted (for example: `/en` or `/he`).
 
 ---
 
@@ -67,7 +58,6 @@ Open `character.html` from the project root to preview the character concept on 
 |---|---|---|
 | **Production** | `https://orithmicsoftware.github.io/milo-math-monkey/` | Push to `main` |
 | **Staging** | `https://orithmicsoftware.github.io/milo-math-monkey/staging/` | Push to any feature branch or PR |
-| **Character prototype (staging)** | `https://orithmicsoftware.github.io/milo-math-monkey/staging/character.html` | Included with staging deploys |
 
 Both environments are deployed automatically to GitHub Pages via GitHub Actions.  
 The **staging** environment shows a visible pink banner at the top of the page so it cannot be confused with production.
@@ -93,9 +83,6 @@ GitHub Pages is configured to serve the `gh-pages` branch.
 ├── config.js           # Environment flag (production | staging)
 ├── sounds/
 │   └── fail/           # Wrong-answer sounds + manifest.json (auto-rotated)
-├── character.html      # Standalone Milo character concept prototype
-├── styles.css          # Styling for the character prototype
-├── script.js           # Sound + animation hooks for the character prototype
 └── .github/
     └── workflows/
         ├── deploy-production.yml   # Production deployment

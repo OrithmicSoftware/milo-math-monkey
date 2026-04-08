@@ -19,7 +19,7 @@
   --dark:    #333333;
   --shadow:  0 6px 20px rgba(0,0,0,.18);
   --radius:  20px;
-  --font:    'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', cursive;
+  --font:    'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', cursive;
 }
 
 body {
@@ -61,6 +61,7 @@ body {
   text-shadow: 3px 3px 0 var(--orange), 6px 6px 0 rgba(0,0,0,.15);
   line-height: 1.1;
   margin-bottom: 10px;
+  white-space: pre-line;
 }
 
 .game-slogan {
@@ -75,6 +76,23 @@ body {
   letter-spacing: 10px;
   margin-bottom: 30px;
   animation: colorCycle 3s linear infinite;
+}
+
+.language-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  color: var(--white);
+  font-size: 1.1rem;
+}
+
+#language-select {
+  border: none;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-family: var(--font);
+  font-size: 1rem;
 }
 
 @keyframes colorCycle {
@@ -155,6 +173,10 @@ body {
 }
 .game-header h2 { font-size: 1.4rem; color: var(--purple); }
 .question-counter { background: var(--purple); color: var(--white); border-radius: 12px; padding: 4px 14px; font-size: .95rem; }
+
+html[dir="rtl"] .game-header {
+  flex-direction: row-reverse;
+}
 
 .milo-stage {
   position: relative;

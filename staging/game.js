@@ -5,6 +5,7 @@
 // ─────────────────────────────────────────────
 const gameState = {
   activeGame: null,
+  language: 'en',
   score: 0,
   totalAnswered: 0,
   questionsPerRound: 5,
@@ -13,6 +14,302 @@ const gameState = {
   currentQ: null,
   answered: false,
 };
+
+const SUPPORTED_LANGUAGES = ['en', 'ru', 'he', 'ar'];
+const RTL_LANGUAGES = new Set(['he', 'ar']);
+
+const I18N = {
+  en: {
+    welcomeTitle: 'Milo the\nMath Monkey',
+    welcomeSlogan: '"Count it right… or watch Milo take a tumble!"',
+    languageLabel: 'Language',
+    menuTitle: '🐵 Choose a Mini-Game!',
+    aria: { answers: 'Answer choices' },
+    buttons: {
+      play: '🎮 Play!',
+      nextQuestion: 'Next Question ➡️',
+      seeResults: 'See Results 🏆',
+      backToMenu: '⬅ Back to Menu',
+      playAgain: '🔄 Play Again',
+      chooseGame: '🎮 Choose Game',
+    },
+    labels: {
+      score: '⭐ Score: {score} / {total}',
+      questionCounter: 'Q {current} / {total}',
+    },
+    cards: {
+      counting: { title: 'Counting Chaos', desc: 'Count the items before Milo grabs too many balloons and flies away!', badge: 'Counting 1–20' },
+      measuring: { title: 'Measuring Mayhem', desc: 'Get it wrong and Milo falls face-first into the jelly!', badge: 'Size & Comparison' },
+      sharing: { title: 'Sharing Snacks', desc: 'Wrong answer and the characters roll away with ALL the snacks!', badge: 'Addition & Subtraction' },
+      weight: { title: 'Weight Trouble', desc: 'Wrong weight comparison launches Milo off the seesaw — BOING!', badge: 'Heavier & Lighter' },
+    },
+    games: {
+      counting: { title: 'Counting Chaos 🎈' },
+      measuring: { title: 'Measuring Mayhem 📏' },
+      sharing: { title: 'Sharing Snacks 🍌' },
+      weight: { title: 'Weight Trouble ⚖️' },
+    },
+    items: {
+      counting: { balloons: 'balloons', bananas: 'bananas', stars: 'stars', bees: 'bees', apples: 'apples', flowers: 'flowers' },
+      snacks: { bananas: 'bananas', cookies: 'cookies', berries: 'berries', peanuts: 'peanuts', candies: 'candies' },
+      measureLabels: { bigTree: 'a big tree', tinySprout: 'a tiny sprout', elephant: 'an elephant', mouse: 'a mouse', house: 'a house', tent: 'a tent', train: 'a train', bicycle: 'a bicycle', watermelon: 'a watermelon', grapes: 'grapes', dinosaur: 'a dinosaur', bunny: 'a bunny', ocean: 'the ocean', bathtub: 'a bathtub', sun: 'the sun', moon: 'the moon' },
+      weightLabels: { magnet: 'a magnet', feather: 'a feather', bigRock: 'a big rock', leaf: 'a leaf', books: 'books', balloon: 'a balloon', toyCar: 'a toy car', teddyBear: 'a teddy bear', apple: 'an apple', strawberry: 'a strawberry', football: 'a football', pingPongBall: 'a ping pong ball', lion: 'a lion', hamster: 'a hamster' },
+    },
+    questions: {
+      counting: 'How many {item} does Milo see? 🐵',
+      measuringBigger: 'Which is BIGGER: {a} or {b}?',
+      measuringSmaller: 'Which is SMALLER: {a} or {b}?',
+      sharingAdd: 'Milo has {a} {item}, then finds {b} more. How many altogether?',
+      sharingSub: 'Milo has {total} {item} and eats {eaten}. How many are left?',
+      weightHeavier: 'Which is HEAVIER: {a} or {b}?',
+      weightLighter: 'Which is LIGHTER: {a} or {b}?',
+    },
+    feedback: {
+      countingWrong: 'Oh no! Milo grabbed too many balloons and FLEW AWAY! 🎈🎈🎈',
+      countingCorrect: 'Great counting! Milo lands safely! 🐵🎉',
+      measuringWrong: 'Oops! Milo measured wrong and fell into the jelly! 🫙💥',
+      measuringCorrect: 'Perfect measuring! Milo stays dry! 📏🐵✨',
+      sharingWrong: 'Uh oh! Wrong share! The friends rolled away with ALL the snacks! 🍌🎲',
+      sharingCorrect: 'Sharing is caring! Everyone gets their snacks! 🐵🍌🎉',
+      weightWrong: 'BOING! Wrong weight — Milo got launched off the seesaw! 🪂',
+      weightCorrect: 'The seesaw balances! Great thinking! ⚖️🐵🎊',
+    },
+    results: {
+      title: 'Round Complete!',
+      scoreText: 'You got {score} out of {total} correct!',
+      goodEffort: 'Good effort! Keep practicing with Milo!',
+      perfect: 'PERFECT SCORE! Milo is so proud of you! 🐵🎊',
+      great: 'Great job! You are getting really good at math! 🐵',
+    },
+    envBadge: '🚧 STAGING ENVIRONMENT — not for production use 🚧',
+  },
+  ru: {
+    welcomeTitle: 'Мило —\nМатематическая Обезьянка',
+    welcomeSlogan: '"Считай правильно… или Мило снова попадёт в беду!"',
+    languageLabel: 'Язык',
+    menuTitle: '🐵 Выбери мини-игру!',
+    aria: { answers: 'Варианты ответа' },
+    buttons: {
+      play: '🎮 Играть!',
+      nextQuestion: 'Следующий вопрос ➡️',
+      seeResults: 'Показать результат 🏆',
+      backToMenu: '⬅ Назад в меню',
+      playAgain: '🔄 Играть снова',
+      chooseGame: '🎮 Выбрать игру',
+    },
+    labels: { score: '⭐ Счёт: {score} / {total}', questionCounter: 'Вопрос {current} / {total}' },
+    cards: {
+      counting: { title: 'Счётный хаос', desc: 'Сосчитай предметы, пока Мило не улетел с шариками!', badge: 'Счёт 1–20' },
+      measuring: { title: 'Измерительный переполох', desc: 'Ошибись — и Мило плюхнется в желе!', badge: 'Размер и сравнение' },
+      sharing: { title: 'Делим угощения', desc: 'Неверный ответ — и друзья укатят со ВСЕМИ вкусняшками!', badge: 'Сложение и вычитание' },
+      weight: { title: 'Весовые неприятности', desc: 'Ошибка в сравнении веса — и Мило улетает с качелей!', badge: 'Тяжелее и легче' },
+    },
+    games: {
+      counting: { title: 'Счётный хаос 🎈' },
+      measuring: { title: 'Измерительный переполох 📏' },
+      sharing: { title: 'Делим угощения 🍌' },
+      weight: { title: 'Весовые неприятности ⚖️' },
+    },
+    items: {
+      counting: { balloons: 'шариков', bananas: 'бананов', stars: 'звёзд', bees: 'пчёл', apples: 'яблок', flowers: 'цветов' },
+      snacks: { bananas: 'бананов', cookies: 'печенек', berries: 'ягод', peanuts: 'орешков', candies: 'конфет' },
+      measureLabels: { bigTree: 'большое дерево', tinySprout: 'маленький росток', elephant: 'слон', mouse: 'мышка', house: 'дом', tent: 'палатка', train: 'поезд', bicycle: 'велосипед', watermelon: 'арбуз', grapes: 'виноград', dinosaur: 'динозавр', bunny: 'кролик', ocean: 'океан', bathtub: 'ванна', sun: 'солнце', moon: 'луна' },
+      weightLabels: { magnet: 'магнит', feather: 'перо', bigRock: 'большой камень', leaf: 'лист', books: 'книги', balloon: 'шарик', toyCar: 'игрушечная машинка', teddyBear: 'плюшевый мишка', apple: 'яблоко', strawberry: 'клубника', football: 'футбольный мяч', pingPongBall: 'мячик для пинг-понга', lion: 'лев', hamster: 'хомяк' },
+    },
+    questions: {
+      counting: 'Сколько {item} видит Мило? 🐵',
+      measuringBigger: 'Что БОЛЬШЕ: {a} или {b}?',
+      measuringSmaller: 'Что МЕНЬШЕ: {a} или {b}?',
+      sharingAdd: 'У Мило {a} {item}, потом он находит ещё {b}. Сколько стало всего?',
+      sharingSub: 'У Мило {total} {item}, и он съедает {eaten}. Сколько осталось?',
+      weightHeavier: 'Что ТЯЖЕЛЕЕ: {a} или {b}?',
+      weightLighter: 'Что ЛЕГЧЕ: {a} или {b}?',
+    },
+    feedback: {
+      countingWrong: 'О нет! Мило схватил слишком много шариков и УЛЕТЕЛ! 🎈🎈🎈',
+      countingCorrect: 'Отличный счёт! Мило приземлился безопасно! 🐵🎉',
+      measuringWrong: 'Упс! Мило ошибся в измерении и упал в желе! 🫙💥',
+      measuringCorrect: 'Отлично измерено! Мило сухой и довольный! 📏🐵✨',
+      sharingWrong: 'Ой-ой! Неправильно поделили — друзья укатили со всеми вкусняшками! 🍌🎲',
+      sharingCorrect: 'Делиться — это здорово! Всем достались угощения! 🐵🍌🎉',
+      weightWrong: 'БУМ! Ошибка в весе — Мило улетел с качелей! 🪂',
+      weightCorrect: 'Качели в равновесии! Отличное мышление! ⚖️🐵🎊',
+    },
+    results: {
+      title: 'Раунд завершён!',
+      scoreText: 'Ты ответил правильно на {score} из {total}!',
+      goodEffort: 'Хорошая попытка! Продолжай тренироваться с Мило!',
+      perfect: 'ИДЕАЛЬНО! Мило очень тобой гордится! 🐵🎊',
+      great: 'Отличная работа! Ты здорово считаешь! 🐵',
+    },
+    envBadge: '🚧 СРЕДА STAGING — не для продакшена 🚧',
+  },
+  he: {
+    welcomeTitle: 'מילו קוף\nהמתמטיקה',
+    welcomeSlogan: '"תספור נכון… או שתראו את מילו מסתבך!"',
+    languageLabel: 'שפה',
+    menuTitle: '🐵 בחרו מיני-משחק!',
+    aria: { answers: 'אפשרויות תשובה' },
+    buttons: {
+      play: '🎮 משחקים!',
+      nextQuestion: 'שאלה הבאה ➡️',
+      seeResults: 'לתוצאות 🏆',
+      backToMenu: '⬅ חזרה לתפריט',
+      playAgain: '🔄 משחקים שוב',
+      chooseGame: '🎮 בוחרים משחק',
+    },
+    labels: { score: '⭐ ניקוד: {score} / {total}', questionCounter: 'שאלה {current} / {total}' },
+    cards: {
+      counting: { title: 'בלגן ספירה', desc: 'ספרו את הפריטים לפני שמילו יעוף עם יותר מדי בלונים!', badge: 'ספירה 1–20' },
+      measuring: { title: 'מהומת מדידה', desc: 'טעות — ומילו נופל ישר לג׳לי!', badge: 'גודל והשוואה' },
+      sharing: { title: 'מחלקים חטיפים', desc: 'תשובה שגויה — והחברים מתגלגלים עם כל החטיפים!', badge: 'חיבור וחיסור' },
+      weight: { title: 'צרות משקל', desc: 'השוואת משקל שגויה מעיפה את מילו מהנדנדה!', badge: 'כבד וקל' },
+    },
+    games: {
+      counting: { title: 'בלגן ספירה 🎈' },
+      measuring: { title: 'מהומת מדידה 📏' },
+      sharing: { title: 'מחלקים חטיפים 🍌' },
+      weight: { title: 'צרות משקל ⚖️' },
+    },
+    items: {
+      counting: { balloons: 'בלונים', bananas: 'בננות', stars: 'כוכבים', bees: 'דבורים', apples: 'תפוחים', flowers: 'פרחים' },
+      snacks: { bananas: 'בננות', cookies: 'עוגיות', berries: 'פירות יער', peanuts: 'בוטנים', candies: 'סוכריות' },
+      measureLabels: { bigTree: 'עץ גדול', tinySprout: 'נבט קטן', elephant: 'פיל', mouse: 'עכבר', house: 'בית', tent: 'אוהל', train: 'רכבת', bicycle: 'אופניים', watermelon: 'אבטיח', grapes: 'ענבים', dinosaur: 'דינוזאור', bunny: 'ארנב', ocean: 'האוקיינוס', bathtub: 'אמבטיה', sun: 'השמש', moon: 'הירח' },
+      weightLabels: { magnet: 'מגנט', feather: 'נוצה', bigRock: 'אבן גדולה', leaf: 'עלה', books: 'ספרים', balloon: 'בלון', toyCar: 'מכונית צעצוע', teddyBear: 'דובון', apple: 'תפוח', strawberry: 'תות', football: 'כדורגל', pingPongBall: 'כדור פינג-פונג', lion: 'אריה', hamster: 'אוגר' },
+    },
+    questions: {
+      counting: 'כמה {item} מילו רואה? 🐵',
+      measuringBigger: 'מה יותר גדול: {a} או {b}?',
+      measuringSmaller: 'מה יותר קטן: {a} או {b}?',
+      sharingAdd: 'למילו יש {a} {item}, ואז הוא מוצא עוד {b}. כמה יש בסך הכול?',
+      sharingSub: 'למילו יש {total} {item} והוא אוכל {eaten}. כמה נשאר?',
+      weightHeavier: 'מה יותר כבד: {a} או {b}?',
+      weightLighter: 'מה יותר קל: {a} או {b}?',
+    },
+    feedback: {
+      countingWrong: 'אוי לא! מילו לקח יותר מדי בלונים ו... עף! 🎈🎈🎈',
+      countingCorrect: 'ספירה מעולה! מילו נוחת בבטחה! 🐵🎉',
+      measuringWrong: 'אופס! מילו טעה במדידה ונפל לג׳לי! 🫙💥',
+      measuringCorrect: 'מדידה מושלמת! מילו נשאר יבש! 📏🐵✨',
+      sharingWrong: 'אוי! חילוק לא נכון — החברים התגלגלו עם כל החטיפים! 🍌🎲',
+      sharingCorrect: 'לחלק זה כיף! לכולם יש חטיפים! 🐵🍌🎉',
+      weightWrong: 'בווינג! טעות במשקל — מילו נזרק מהנדנדה! 🪂',
+      weightCorrect: 'הנדנדה מאוזנת! חשיבה נהדרת! ⚖️🐵🎊',
+    },
+    results: {
+      title: 'הסבב הושלם!',
+      scoreText: 'ענית נכון על {score} מתוך {total}!',
+      goodEffort: 'מאמץ יפה! המשיכו להתאמן עם מילו!',
+      perfect: 'מושלם! מילו ממש גאה בכם! 🐵🎊',
+      great: 'עבודה נהדרת! אתם משתפרים מאוד במתמטיקה! 🐵',
+    },
+    envBadge: '🚧 סביבת STAGING — לא לשימוש בייצור 🚧',
+  },
+  ar: {
+    welcomeTitle: 'ميلو قرد\nالرياضيات',
+    welcomeSlogan: '"عدّها جيدًا… وإلا سيتعثر ميلو!"',
+    languageLabel: 'اللغة',
+    menuTitle: '🐵 اختر لعبة صغيرة!',
+    aria: { answers: 'خيارات الإجابة' },
+    buttons: {
+      play: '🎮 العب!',
+      nextQuestion: 'السؤال التالي ➡️',
+      seeResults: 'عرض النتائج 🏆',
+      backToMenu: '⬅ العودة للقائمة',
+      playAgain: '🔄 العب مرة أخرى',
+      chooseGame: '🎮 اختر لعبة',
+    },
+    labels: { score: '⭐ النتيجة: {score} / {total}', questionCounter: 'سؤال {current} / {total}' },
+    cards: {
+      counting: { title: 'فوضى العد', desc: 'عدّ العناصر قبل أن يأخذ ميلو بالونات كثيرة ويطير!', badge: 'العد من 1 إلى 20' },
+      measuring: { title: 'فوضى القياس', desc: 'إجابة خاطئة وميلو يسقط في الجيلي!', badge: 'الحجم والمقارنة' },
+      sharing: { title: 'تقاسم الوجبات', desc: 'إجابة خاطئة والأصدقاء يهربون بكل الوجبات!', badge: 'الجمع والطرح' },
+      weight: { title: 'مشكلة الوزن', desc: 'مقارنة وزن خاطئة تطلق ميلو من الأرجوحة!', badge: 'أثقل وأخف' },
+    },
+    games: {
+      counting: { title: 'فوضى العد 🎈' },
+      measuring: { title: 'فوضى القياس 📏' },
+      sharing: { title: 'تقاسم الوجبات 🍌' },
+      weight: { title: 'مشكلة الوزن ⚖️' },
+    },
+    items: {
+      counting: { balloons: 'بالونات', bananas: 'موز', stars: 'نجوم', bees: 'نحل', apples: 'تفاح', flowers: 'زهور' },
+      snacks: { bananas: 'موز', cookies: 'بسكويت', berries: 'توت', peanuts: 'فول سوداني', candies: 'حلويات' },
+      measureLabels: { bigTree: 'شجرة كبيرة', tinySprout: 'نبتة صغيرة', elephant: 'فيل', mouse: 'فأر', house: 'منزل', tent: 'خيمة', train: 'قطار', bicycle: 'دراجة', watermelon: 'بطيخة', grapes: 'عنب', dinosaur: 'ديناصور', bunny: 'أرنب', ocean: 'المحيط', bathtub: 'حوض استحمام', sun: 'الشمس', moon: 'القمر' },
+      weightLabels: { magnet: 'مغناطيس', feather: 'ريشة', bigRock: 'صخرة كبيرة', leaf: 'ورقة', books: 'كتب', balloon: 'بالون', toyCar: 'سيارة لعبة', teddyBear: 'دبدوب', apple: 'تفاحة', strawberry: 'فراولة', football: 'كرة قدم', pingPongBall: 'كرة تنس طاولة', lion: 'أسد', hamster: 'هامستر' },
+    },
+    questions: {
+      counting: 'كم عدد {item} التي يراها ميلو؟ 🐵',
+      measuringBigger: 'أيّهما أكبر: {a} أم {b}؟',
+      measuringSmaller: 'أيّهما أصغر: {a} أم {b}؟',
+      sharingAdd: 'مع ميلو {a} من {item}، ثم يجد {b} أخرى. كم أصبح المجموع؟',
+      sharingSub: 'مع ميلو {total} من {item} وأكل {eaten}. كم بقي؟',
+      weightHeavier: 'أيّهما أثقل: {a} أم {b}؟',
+      weightLighter: 'أيّهما أخف: {a} أم {b}؟',
+    },
+    feedback: {
+      countingWrong: 'أوه لا! أخذ ميلو بالونات كثيرة وطار بعيدًا! 🎈🎈🎈',
+      countingCorrect: 'عدّ ممتاز! هبط ميلو بسلام! 🐵🎉',
+      measuringWrong: 'أوبس! أخطأ ميلو في القياس وسقط في الجيلي! 🫙💥',
+      measuringCorrect: 'قياس رائع! ميلو بقي جافًا! 📏🐵✨',
+      sharingWrong: 'يا إلهي! تقاسم خاطئ — الأصدقاء تدحرجوا مع كل الوجبات! 🍌🎲',
+      sharingCorrect: 'المشاركة رائعة! الجميع حصل على وجبته! 🐵🍌🎉',
+      weightWrong: 'بويـنغ! مقارنة وزن خاطئة — انطلق ميلو من الأرجوحة! 🪂',
+      weightCorrect: 'الأرجوحة متوازنة! تفكير ممتاز! ⚖️🐵🎊',
+    },
+    results: {
+      title: 'انتهت الجولة!',
+      scoreText: 'أجبت بشكل صحيح على {score} من {total}!',
+      goodEffort: 'مجهود رائع! استمر في التدريب مع ميلو!',
+      perfect: 'نتيجة مثالية! ميلو فخور بك جدًا! 🐵🎊',
+      great: 'عمل رائع! أنت تتحسن كثيرًا في الرياضيات! 🐵',
+    },
+    envBadge: '🚧 بيئة STAGING — ليست للإنتاج 🚧',
+  },
+};
+
+function getNestedTranslation(path, language) {
+  const base = I18N[language];
+  if (!base) return undefined;
+  return path.split('.').reduce((obj, key) => (obj && key in obj ? obj[key] : undefined), base);
+}
+
+function interpolate(text, params) {
+  const values = params || {};
+  return text.replace(/\{([^}]+)\}/g, (full, key) => (
+    key in values ? String(values[key]) : full
+  ));
+}
+
+function t(path, params) {
+  const inLanguage = getNestedTranslation(path, gameState.language);
+  const fallback = getNestedTranslation(path, 'en');
+  const value = inLanguage !== undefined ? inLanguage : fallback;
+  return typeof value === 'string' ? interpolate(value, params) : value;
+}
+
+function getLanguageFromUrlPath() {
+  if (typeof window === 'undefined' || !window.location) return null;
+
+  const segments = window.location.pathname
+    .split('/')
+    .filter(Boolean)
+    .map(segment => {
+      try {
+        return decodeURIComponent(segment).toLowerCase();
+      } catch {
+        return segment.toLowerCase();
+      }
+    });
+
+  for (let i = segments.length - 1; i >= 0; i -= 1) {
+    if (SUPPORTED_LANGUAGES.includes(segments[i])) {
+      return segments[i];
+    }
+  }
+
+  return null;
+}
 
 // ─────────────────────────────────────────────
 //  Utility helpers
@@ -125,18 +422,19 @@ function showScreen(id) {
 
 /* ── 1. Counting Chaos ─────────────────────── */
 const COUNTING_ITEMS = [
-  { emoji: '🎈', name: 'balloons' },
-  { emoji: '🍌', name: 'bananas'  },
-  { emoji: '⭐', name: 'stars'    },
-  { emoji: '🐝', name: 'bees'     },
-  { emoji: '🍎', name: 'apples'   },
-  { emoji: '🌸', name: 'flowers'  },
+  { emoji: '🎈', nameKey: 'balloons' },
+  { emoji: '🍌', nameKey: 'bananas'  },
+  { emoji: '⭐', nameKey: 'stars'    },
+  { emoji: '🐝', nameKey: 'bees'     },
+  { emoji: '🍎', nameKey: 'apples'   },
+  { emoji: '🌸', nameKey: 'flowers'  },
 ];
 
 function makeCountingQuestion() {
   const item  = COUNTING_ITEMS[randInt(0, COUNTING_ITEMS.length - 1)];
   const count = randInt(1, 20);
   const correct = count;
+  const itemName = t('items.counting.' + item.nameKey);
 
   const distractors = new Set();
   while (distractors.size < 3) {
@@ -147,32 +445,34 @@ function makeCountingQuestion() {
   return {
     type: 'counting',
     scene: repeat(item.emoji, count),
-    question: 'How many ' + item.name + ' does Milo see? 🐵',
+    question: t('questions.counting', { item: itemName }),
     correct,
     choices: shuffle([correct, ...distractors]),
     wrongAnim: 'float',
-    wrongMsg: 'Oh no! Milo grabbed too many balloons and FLEW AWAY! 🎈🎈🎈',
-    correctMsg: 'Great counting! Milo lands safely! 🐵🎉',
+    wrongMsg: t('feedback.countingWrong'),
+    correctMsg: t('feedback.countingCorrect'),
   };
 }
 
 /* ── 2. Measuring Mayhem ───────────────────── */
 const MEASURE_PAIRS = [
-  { a: { emoji: '🌳', label: 'a big tree'   }, b: { emoji: '🌱', label: 'a tiny sprout'    } },
-  { a: { emoji: '🐘', label: 'an elephant'  }, b: { emoji: '🐭', label: 'a mouse'           } },
-  { a: { emoji: '🏠', label: 'a house'      }, b: { emoji: '⛺', label: 'a tent'             } },
-  { a: { emoji: '🚂', label: 'a train'      }, b: { emoji: '🚲', label: 'a bicycle'         } },
-  { a: { emoji: '🍉', label: 'a watermelon' }, b: { emoji: '🍇', label: 'grapes'             } },
-  { a: { emoji: '🦕', label: 'a dinosaur'   }, b: { emoji: '🐇', label: 'a bunny'           } },
-  { a: { emoji: '🌊', label: 'the ocean'    }, b: { emoji: '🛁', label: 'a bathtub'         } },
-  { a: { emoji: '🌞', label: 'the sun'      }, b: { emoji: '🌙', label: 'the moon'          } },
+  { a: { emoji: '🌳', labelKey: 'bigTree'    }, b: { emoji: '🌱', labelKey: 'tinySprout' } },
+  { a: { emoji: '🐘', labelKey: 'elephant'   }, b: { emoji: '🐭', labelKey: 'mouse'      } },
+  { a: { emoji: '🏠', labelKey: 'house'      }, b: { emoji: '⛺', labelKey: 'tent'       } },
+  { a: { emoji: '🚂', labelKey: 'train'      }, b: { emoji: '🚲', labelKey: 'bicycle'    } },
+  { a: { emoji: '🍉', labelKey: 'watermelon' }, b: { emoji: '🍇', labelKey: 'grapes'     } },
+  { a: { emoji: '🦕', labelKey: 'dinosaur'   }, b: { emoji: '🐇', labelKey: 'bunny'      } },
+  { a: { emoji: '🌊', labelKey: 'ocean'      }, b: { emoji: '🛁', labelKey: 'bathtub'    } },
+  { a: { emoji: '🌞', labelKey: 'sun'        }, b: { emoji: '🌙', labelKey: 'moon'       } },
 ];
 
 function makeMeasuringQuestion() {
   const pair     = MEASURE_PAIRS[randInt(0, MEASURE_PAIRS.length - 1)];
   const askBig   = Math.random() < 0.5;
-  const bigLabel = pair.a.emoji + ' ' + pair.a.label;
-  const smlLabel = pair.b.emoji + ' ' + pair.b.label;
+  const aLabel = t('items.measureLabels.' + pair.a.labelKey);
+  const bLabel = t('items.measureLabels.' + pair.b.labelKey);
+  const bigLabel = pair.a.emoji + ' ' + aLabel;
+  const smlLabel = pair.b.emoji + ' ' + bLabel;
   const correct  = askBig ? bigLabel : smlLabel;
   const choices  = shuffle([bigLabel, smlLabel]);
 
@@ -180,28 +480,29 @@ function makeMeasuringQuestion() {
     type: 'measuring',
     scene: pair.a.emoji + '   ' + pair.b.emoji,
     question: askBig
-      ? 'Which is BIGGER: ' + pair.a.label + ' or ' + pair.b.label + '?'
-      : 'Which is SMALLER: ' + pair.a.label + ' or ' + pair.b.label + '?',
+      ? t('questions.measuringBigger', { a: aLabel, b: bLabel })
+      : t('questions.measuringSmaller', { a: aLabel, b: bLabel }),
     correct,
     choices,
     wrongAnim: 'fall',
-    wrongMsg: 'Oops! Milo measured wrong and fell into the jelly! 🫙💥',
-    correctMsg: 'Perfect measuring! Milo stays dry! 📏🐵✨',
+    wrongMsg: t('feedback.measuringWrong'),
+    correctMsg: t('feedback.measuringCorrect'),
   };
 }
 
 /* ── 3. Sharing Snacks ─────────────────────── */
 const SNACK_ITEMS = [
-  { emoji: '🍌', name: 'bananas' },
-  { emoji: '🍪', name: 'cookies' },
-  { emoji: '🍓', name: 'berries' },
-  { emoji: '🥜', name: 'peanuts' },
-  { emoji: '🍬', name: 'candies' },
+  { emoji: '🍌', nameKey: 'bananas' },
+  { emoji: '🍪', nameKey: 'cookies' },
+  { emoji: '🍓', nameKey: 'berries' },
+  { emoji: '🥜', nameKey: 'peanuts' },
+  { emoji: '🍬', nameKey: 'candies' },
 ];
 
 function makeSharingQuestion() {
   const item  = SNACK_ITEMS[randInt(0, SNACK_ITEMS.length - 1)];
-  const mode  = randInt(0, 2); // 0=addition  1=subtraction  2=division
+  const mode  = randInt(0, 1); // 0=addition  1=subtraction
+  const itemName = t('items.snacks.' + item.nameKey);
 
   let question, correct, scene;
 
@@ -209,19 +510,12 @@ function makeSharingQuestion() {
     const a = randInt(1, 10), b = randInt(1, 10);
     correct  = a + b;
     scene    = repeat(item.emoji, a) + '  ➕  ' + repeat(item.emoji, b);
-    question = 'Milo has ' + a + ' ' + item.name + ', then finds ' + b + ' more. How many altogether?';
+    question = t('questions.sharingAdd', { a, b, item: itemName });
   } else if (mode === 1) {
     const total = randInt(3, 15), eaten = randInt(1, total - 1);
     correct  = total - eaten;
     scene    = repeat(item.emoji, total);
-    question = 'Milo has ' + total + ' ' + item.name + ' and eats ' + eaten + '. How many are left?';
-  } else {
-    const friends   = randInt(2, 4);
-    const perFriend = randInt(1, 5);
-    const total     = friends * perFriend;
-    correct  = perFriend;
-    scene    = repeat(item.emoji, total);
-    question = 'Milo shares ' + total + ' ' + item.name + ' equally among ' + friends + ' friends. How many each?';
+    question = t('questions.sharingSub', { total, eaten, item: itemName });
   }
 
   const distractors = new Set();
@@ -237,8 +531,8 @@ function makeSharingQuestion() {
     correct,
     choices: shuffle([correct, ...distractors]),
     wrongAnim: 'tumble',
-    wrongMsg: 'Uh oh! Wrong share! The friends rolled away with ALL the snacks! 🍌🎲',
-    correctMsg: 'Sharing is caring! Everyone gets their snacks! 🐵🍌🎉',
+    wrongMsg: t('feedback.sharingWrong'),
+    correctMsg: t('feedback.sharingCorrect'),
   };
 }
 
@@ -335,20 +629,22 @@ function makeCompoundQuestion() {
 
 /* ── 7. Weight Trouble ─────────────────────── */
 const WEIGHT_PAIRS = [
-  { a: { emoji: '🧲', label: 'a magnet'        }, b: { emoji: '🪶', label: 'a feather'        } },
-  { a: { emoji: '🪨', label: 'a big rock'      }, b: { emoji: '🍃', label: 'a leaf'           } },
-  { a: { emoji: '📚', label: 'books'            }, b: { emoji: '🎈', label: 'a balloon'        } },
-  { a: { emoji: '🚗', label: 'a toy car'       }, b: { emoji: '🧸', label: 'a teddy bear'     } },
-  { a: { emoji: '🍎', label: 'an apple'         }, b: { emoji: '🍓', label: 'a strawberry'     } },
-  { a: { emoji: '⚽', label: 'a football'       }, b: { emoji: '🏓', label: 'a ping pong ball' } },
-  { a: { emoji: '🦁', label: 'a lion'           }, b: { emoji: '🐹', label: 'a hamster'        } },
+  { a: { emoji: '🧲', labelKey: 'magnet'       }, b: { emoji: '🪶', labelKey: 'feather'      } },
+  { a: { emoji: '🪨', labelKey: 'bigRock'      }, b: { emoji: '🍃', labelKey: 'leaf'         } },
+  { a: { emoji: '📚', labelKey: 'books'        }, b: { emoji: '🎈', labelKey: 'balloon'      } },
+  { a: { emoji: '🚗', labelKey: 'toyCar'       }, b: { emoji: '🧸', labelKey: 'teddyBear'    } },
+  { a: { emoji: '🍎', labelKey: 'apple'        }, b: { emoji: '🍓', labelKey: 'strawberry'   } },
+  { a: { emoji: '⚽', labelKey: 'football'     }, b: { emoji: '🏓', labelKey: 'pingPongBall' } },
+  { a: { emoji: '🦁', labelKey: 'lion'         }, b: { emoji: '🐹', labelKey: 'hamster'      } },
 ];
 
 function makeWeightQuestion() {
   const pair      = WEIGHT_PAIRS[randInt(0, WEIGHT_PAIRS.length - 1)];
   const askHeavy  = Math.random() < 0.5;
-  const heavyLabel = pair.a.emoji + ' ' + pair.a.label;
-  const lightLabel = pair.b.emoji + ' ' + pair.b.label;
+  const aLabel = t('items.weightLabels.' + pair.a.labelKey);
+  const bLabel = t('items.weightLabels.' + pair.b.labelKey);
+  const heavyLabel = pair.a.emoji + ' ' + aLabel;
+  const lightLabel = pair.b.emoji + ' ' + bLabel;
   const correct    = askHeavy ? heavyLabel : lightLabel;
   const choices    = shuffle([heavyLabel, lightLabel]);
 
@@ -358,13 +654,13 @@ function makeWeightQuestion() {
     seesawA: pair.a.emoji,
     seesawB: pair.b.emoji,
     question: askHeavy
-      ? 'Which is HEAVIER: ' + pair.a.label + ' or ' + pair.b.label + '?'
-      : 'Which is LIGHTER: ' + pair.a.label + ' or ' + pair.b.label + '?',
+      ? t('questions.weightHeavier', { a: aLabel, b: bLabel })
+      : t('questions.weightLighter', { a: aLabel, b: bLabel }),
     correct,
     choices,
     wrongAnim: 'launch',
-    wrongMsg: 'BOING! Wrong weight — Milo got launched off the seesaw! 🪂',
-    correctMsg: 'The seesaw balances! Great thinking! ⚖️🐵🎊',
+    wrongMsg: t('feedback.weightWrong'),
+    correctMsg: t('feedback.weightCorrect'),
   };
 }
 
@@ -372,13 +668,13 @@ function makeWeightQuestion() {
 //  Game registry
 // ─────────────────────────────────────────────
 const MINI_GAMES = {
-  counting: { title: 'Counting Chaos 🎈',   makeQuestion: makeCountingQuestion  },
-  measuring:{ title: 'Measuring Mayhem 📏', makeQuestion: makeMeasuringQuestion },
-  sharing:  { title: 'Sharing Snacks 🍌',   makeQuestion: makeSharingQuestion   },
+  counting: { titleKey: 'games.counting.title',   makeQuestion: makeCountingQuestion  },
+  measuring:{ titleKey: 'games.measuring.title',  makeQuestion: makeMeasuringQuestion },
+  sharing:  { titleKey: 'games.sharing.title',    makeQuestion: makeSharingQuestion   },
   whoMore:  { title: 'Who Has More? 🙋',    makeQuestion: makeWhoHasMoreQuestion },
   whatMore: { title: 'What Is More? 👀',    makeQuestion: makeWhatIsMoreQuestion },
   compound: { title: 'Compound Crunch ➕➖', makeQuestion: makeCompoundQuestion   },
-  weight:   { title: 'Weight Trouble ⚖️',   makeQuestion: makeWeightQuestion    },
+  weight:   { titleKey: 'games.weight.title',     makeQuestion: makeWeightQuestion },
 };
 
 // ─────────────────────────────────────────────
@@ -394,7 +690,56 @@ function buildRound(gameKey) {
 // ─────────────────────────────────────────────
 function updateScoreDisplay() {
   document.getElementById('score-display').textContent =
-    '⭐ Score: ' + gameState.score + ' / ' + gameState.totalAnswered;
+    t('labels.score', { score: gameState.score, total: gameState.totalAnswered });
+}
+
+function getGameTitle(gameKey) {
+  const game = MINI_GAMES[gameKey];
+  if (!game) return '';
+  if (game.titleKey) return t(game.titleKey);
+  return game.title || '';
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = value;
+}
+
+function applyLanguage() {
+  document.documentElement.lang = gameState.language;
+  document.documentElement.dir = RTL_LANGUAGES.has(gameState.language) ? 'rtl' : 'ltr';
+
+  setText('welcome-title', t('welcomeTitle'));
+  setText('welcome-slogan', t('welcomeSlogan'));
+  setText('language-label', t('languageLabel'));
+  setText('play-btn', t('buttons.play'));
+  setText('menu-title', t('menuTitle'));
+  setText('card-counting-title', t('cards.counting.title'));
+  setText('card-counting-desc', t('cards.counting.desc'));
+  setText('card-counting-badge', t('cards.counting.badge'));
+  setText('card-measuring-title', t('cards.measuring.title'));
+  setText('card-measuring-desc', t('cards.measuring.desc'));
+  setText('card-measuring-badge', t('cards.measuring.badge'));
+  setText('card-sharing-title', t('cards.sharing.title'));
+  setText('card-sharing-desc', t('cards.sharing.desc'));
+  setText('card-sharing-badge', t('cards.sharing.badge'));
+  setText('card-weight-title', t('cards.weight.title'));
+  setText('card-weight-desc', t('cards.weight.desc'));
+  setText('card-weight-badge', t('cards.weight.badge'));
+  setText('next-btn', t('buttons.nextQuestion'));
+  setText('back-to-menu-btn', t('buttons.backToMenu'));
+  setText('results-title', t('results.title'));
+  setText('play-again-btn', t('buttons.playAgain'));
+  setText('choose-game-btn', t('buttons.chooseGame'));
+  setText('env-badge-text', t('envBadge'));
+
+  const answersGrid = document.getElementById('answers-grid');
+  if (answersGrid) {
+    answersGrid.setAttribute('aria-label', t('aria.answers'));
+  }
+
+  updateScoreDisplay();
 }
 
 // ─────────────────────────────────────────────
@@ -403,9 +748,9 @@ function updateScoreDisplay() {
 function renderQuestion() {
   const q = gameState.currentQ;
 
-  document.getElementById('game-title-label').textContent = MINI_GAMES[gameState.activeGame].title;
+  document.getElementById('game-title-label').textContent = getGameTitle(gameState.activeGame);
   document.getElementById('question-counter').textContent =
-    'Q ' + (gameState.questionIndex + 1) + ' / ' + gameState.questionsPerRound;
+    t('labels.questionCounter', { current: gameState.questionIndex + 1, total: gameState.questionsPerRound });
 
   // Reset Milo animation
   const miloEl = document.getElementById('milo-char');
@@ -500,7 +845,7 @@ function handleAnswer(chosen) {
   // Show next / finish button
   const nextBtn = document.getElementById('next-btn');
   const isLast  = gameState.questionIndex >= gameState.questionsPerRound - 1;
-  nextBtn.textContent = isLast ? 'See Results 🏆' : 'Next Question ➡️';
+  nextBtn.textContent = isLast ? t('buttons.seeResults') : t('buttons.nextQuestion');
   nextBtn.style.display = 'inline-block';
 }
 
@@ -523,20 +868,20 @@ function advanceQuestion() {
 function showResults() {
   const pct = gameState.score / gameState.questionsPerRound;
   let stars = '⭐';
-  let msg   = 'Good effort! Keep practicing with Milo!';
+  let msg   = t('results.goodEffort');
   if (pct === 1) {
     stars = '⭐⭐⭐';
-    msg   = 'PERFECT SCORE! Milo is so proud of you! 🐵🎊';
+    msg   = t('results.perfect');
   } else if (pct >= 0.6) {
     stars = '⭐⭐';
-    msg   = 'Great job! You are getting really good at math! 🐵';
+    msg   = t('results.great');
   }
 
   document.getElementById('results-score-text').textContent =
-    'You got ' + gameState.score + ' out of ' + gameState.questionsPerRound + ' correct!';
+    t('results.scoreText', { score: gameState.score, total: gameState.questionsPerRound });
   document.getElementById('results-stars').textContent = stars;
   document.getElementById('results-msg').textContent = msg;
-  document.getElementById('results-game-name').textContent = MINI_GAMES[gameState.activeGame].title;
+  document.getElementById('results-game-name').textContent = getGameTitle(gameState.activeGame);
   showScreen('results-screen');
 }
 
@@ -559,7 +904,42 @@ function startGame(gameKey) {
 //  DOM ready
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  const pathLanguage = getLanguageFromUrlPath();
+  if (pathLanguage) {
+    gameState.language = pathLanguage;
+  }
+
+  let storedLanguage = null;
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      storedLanguage = window.localStorage.getItem('milo-language');
+    }
+  } catch (_) {
+    storedLanguage = null;
+  }
+  if (!pathLanguage && storedLanguage && SUPPORTED_LANGUAGES.includes(storedLanguage)) {
+    gameState.language = storedLanguage;
+  }
+
   scanFailSoundsDirectory();
+
+  applyLanguage();
+
+  const languageSelect = document.getElementById('language-select');
+  if (languageSelect) {
+    languageSelect.value = gameState.language;
+    languageSelect.addEventListener('change', event => {
+      const nextLanguage = event.target.value;
+      if (!SUPPORTED_LANGUAGES.includes(nextLanguage)) return;
+      gameState.language = nextLanguage;
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem('milo-language', gameState.language);
+        }
+      } catch (_) {}
+      applyLanguage();
+    });
+  }
 
   // Welcome → Menu
   document.getElementById('play-btn').addEventListener('click', () => {
