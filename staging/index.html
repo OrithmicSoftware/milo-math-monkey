@@ -18,6 +18,15 @@
     <p class="game-slogan">"Count it right… or watch Milo take a tumble!"</p>
     <div class="number-decoration" aria-hidden="true">1 2 3 4 5</div>
     <button id="play-btn" class="btn btn-play">🎮 Play!</button>
+    <div class="animation-demo" aria-label="Milo animation demo">
+      <p class="animation-demo-title">Try Milo's animations:</p>
+      <span id="milo-demo-char" class="milo-character idle" aria-label="Milo animation demo character">🐵</span>
+      <div class="animation-demo-buttons">
+        <button id="demo-idle-btn" class="demo-btn" type="button">Idle</button>
+        <button id="demo-success-btn" class="demo-btn" type="button">Success</button>
+        <button id="demo-failure-btn" class="demo-btn" type="button">Failure</button>
+      </div>
+    </div>
   </section>
 
   <!-- ══════════════════════════════════════
@@ -48,29 +57,8 @@
       <div class="game-card" data-game="sharing" role="button" tabindex="0" aria-label="Sharing Snacks game">
         <div class="card-icon">🍌</div>
         <div class="card-title">Sharing Snacks</div>
-        <div class="card-desc">Wrong answer and the characters roll away with ALL the snacks!</div>
-        <span class="card-badge">Addition &amp; Subtraction</span>
-      </div>
-
-      <div class="game-card" data-game="whoMore" role="button" tabindex="0" aria-label="Who Has More game">
-        <div class="card-icon">🙋</div>
-        <div class="card-title">Who Has More?</div>
-        <div class="card-desc">Compare two groups and pick who has more items.</div>
-        <span class="card-badge">Count + Compare</span>
-      </div>
-
-      <div class="game-card" data-game="whatMore" role="button" tabindex="0" aria-label="What Is More game">
-        <div class="card-icon">👀</div>
-        <div class="card-title">What Is More?</div>
-        <div class="card-desc">Spot which item appears more in the scene.</div>
-        <span class="card-badge">Comparison</span>
-      </div>
-
-      <div class="game-card" data-game="compound" role="button" tabindex="0" aria-label="Compound Crunch game">
-        <div class="card-icon">➕➖</div>
-        <div class="card-title">Compound Crunch</div>
-        <div class="card-desc">Solve a two-step problem like x + y - z.</div>
-        <span class="card-badge">Compound Operations</span>
+        <div class="card-desc">Wrong division and the characters roll away with ALL the snacks!</div>
+        <span class="card-badge">Add, Subtract &amp; Share</span>
       </div>
 
       <div class="game-card" data-game="weight" role="button" tabindex="0" aria-label="Weight Trouble game">
@@ -131,7 +119,7 @@
   <!-- Environment badge – shown only in staging (set by config.js + game.js) -->
   <div id="env-badge" style="display:none; position:fixed; top:0; left:0; right:0;
        background:#FF4081; color:#fff; text-align:center; padding:6px 0; font-size:.9rem;
-       font-family: 'Comic Sans MS', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', cursive; z-index:9999; letter-spacing:1px;">
+       font-family: 'Comic Sans MS', cursive; z-index:9999; letter-spacing:1px;">
     🚧 STAGING ENVIRONMENT — not for production use 🚧
   </div>
 

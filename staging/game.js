@@ -34,81 +34,12 @@ function repeat(char, n) {
   return Array(n).fill(char).join(' ');
 }
 
-const FAIL_SOUNDS_DIR = 'sounds/fail/';
-const FAIL_SOUNDS_MANIFEST = FAIL_SOUNDS_DIR + 'manifest.json';
-const FALLBACK_FAIL_SOUNDS = [
-  'universfield-cartoon-fail-trumpet-278822.mp3',
-  'olivia_parker-fail-2-demo-306647.mp3',
-  'u_8g40a9z0la-fail-234710.mp3',
-  'x_bass6668-funny-meow-110120.mp3',
-  'mangaletp-funny-laughing-406018.mp3',
-].map(file => FAIL_SOUNDS_DIR + file);
-
-const failSoundState = {
-  urls: [...FALLBACK_FAIL_SOUNDS],
-  nextIndex: 0,
-  didScanDirectory: false,
-};
-
-function normalizeFailSoundUrl(fileName) {
-  if (!fileName) return null;
-  try {
-    return FAIL_SOUNDS_DIR + encodeURIComponent(decodeURIComponent(fileName));
-  } catch {
-    return FAIL_SOUNDS_DIR + encodeURIComponent(fileName);
-  }
-}
-
-async function scanFailSoundsDirectory() {
-  if (failSoundState.didScanDirectory || typeof fetch !== 'function') return;
-  failSoundState.didScanDirectory = true;
-
-  try {
-    const manifestResponse = await fetch(FAIL_SOUNDS_MANIFEST, { cache: 'no-store' });
-    if (manifestResponse.ok) {
-      const manifest = await manifestResponse.json();
-      if (Array.isArray(manifest)) {
-        const fromManifest = manifest
-          .map(fileName => normalizeFailSoundUrl(fileName))
-          .filter(Boolean);
-        if (fromManifest.length > 0) {
-          failSoundState.urls = [...new Set(fromManifest)];
-          failSoundState.nextIndex = 0;
-          return;
-        }
-      }
-    }
-
-    const response = await fetch(FAIL_SOUNDS_DIR, { cache: 'no-store' });
-    if (!response.ok) return;
-
-    const html = await response.text();
-    const doc = new DOMParser().parseFromString(html, 'text/html');
-    const discovered = [...doc.querySelectorAll('a[href]')]
-      .map(link => link.getAttribute('href') || '')
-      .map(href => href.split('#')[0].split('?')[0])
-      .filter(href => /\.(mp3|ogg|wav|m4a)$/i.test(href))
-      .map(href => normalizeFailSoundUrl(href.split('/').pop()))
-      .filter(Boolean);
-
-    if (discovered.length > 0) {
-      failSoundState.urls = [...new Set(discovered)];
-      failSoundState.nextIndex = 0;
-    }
-  } catch {
-    // Keep fallback list when directory scanning is unavailable.
-  }
-}
-
-function playNextFailSound() {
-  if (failSoundState.urls.length === 0 || typeof Audio !== 'function') return;
-  const url = failSoundState.urls[failSoundState.nextIndex % failSoundState.urls.length];
-  failSoundState.nextIndex += 1;
-
-  const audio = new Audio(url);
-  audio.play().catch(() => {
-    // Ignore autoplay/policy failures.
-  });
+function playMiloAnimation(el, animationName) {
+  if (!el) return;
+  el.className = 'milo-character';
+  // Reflow allows restarting CSS animations when switching states.
+  void el.offsetWidth;
+  el.classList.add(animationName);
 }
 
 // ─────────────────────────────────────────────
@@ -125,7 +56,7 @@ function showScreen(id) {
 
 /* ── 1. Counting Chaos ─────────────────────── */
 const COUNTING_ITEMS = [
-  { emoji: '🎈', name: 'balloons' },
+  { emoji: '��', name: 'balloons' },
   { emoji: '🍌', name: 'bananas'  },
   { emoji: '⭐', name: 'stars'    },
   { emoji: '🐝', name: 'bees'     },
@@ -201,7 +132,7 @@ const SNACK_ITEMS = [
 
 function makeSharingQuestion() {
   const item  = SNACK_ITEMS[randInt(0, SNACK_ITEMS.length - 1)];
-  const mode  = randInt(0, 1); // 0=addition  1=subtraction
+  const mode  = randInt(0, 2); // 0=addition  1=subtraction  2=sharing
 
   let question, correct, scene;
 
@@ -215,6 +146,13 @@ function makeSharingQuestion() {
     correct  = total - eaten;
     scene    = repeat(item.emoji, total);
     question = 'Milo has ' + total + ' ' + item.name + ' and eats ' + eaten + '. How many are left?';
+  } else {
+    const friends   = randInt(2, 4);
+    const perFriend = randInt(1, 5);
+    const total     = friends * perFriend;
+    correct  = perFriend;
+    scene    = repeat(item.emoji, total);
+    question = 'Milo shares ' + total + ' ' + item.name + ' equally among ' + friends + ' friends. How many each?';
   }
 
   const distractors = new Set();
@@ -235,98 +173,7 @@ function makeSharingQuestion() {
   };
 }
 
-/* ── 4. Who Has More? ──────────────────────── */
-const WHO_HAS_MORE_FRIENDS = [
-  { emoji: '🦊', name: 'Fifi the fox' },
-  { emoji: '🐼', name: 'Poppy the panda' },
-  { emoji: '🐸', name: 'Freddy the frog' },
-  { emoji: '🐻', name: 'Bobo the bear' },
-  { emoji: '🐧', name: 'Pip the penguin' },
-];
-
-function makeWhoHasMoreQuestion() {
-  const item = SNACK_ITEMS[randInt(0, SNACK_ITEMS.length - 1)];
-  const friend = WHO_HAS_MORE_FRIENDS[randInt(0, WHO_HAS_MORE_FRIENDS.length - 1)];
-
-  const miloCount = randInt(2, 12);
-  let friendCount = randInt(2, 12);
-  while (friendCount === miloCount) friendCount = randInt(2, 12);
-
-  const correct = miloCount > friendCount ? 'Milo' : friend.name;
-
-  return {
-    type: 'who-has-more',
-    scene: '🐵 ' + repeat(item.emoji, miloCount) + '\n' +
-           friend.emoji + ' ' + repeat(item.emoji, friendCount),
-    question: 'Who has more ' + item.name + '?',
-    correct,
-    choices: shuffle(['Milo', friend.name]),
-    wrongAnim: 'fall',
-    wrongMsg: 'Oops! Milo guessed wrong and slipped on snack crumbs! 🍪💥',
-    correctMsg: 'Nice comparing! You spotted who has more! 🐵✅',
-  };
-}
-
-/* ── 5. What Is More? ───────────────────────── */
-const MORE_ITEM_PAIRS = [
-  { a: { emoji: '🍎', name: 'apples' }, b: { emoji: '🍌', name: 'bananas' } },
-  { a: { emoji: '🌟', name: 'stars' }, b: { emoji: '☁️', name: 'clouds' } },
-  { a: { emoji: '🐠', name: 'fish' }, b: { emoji: '🦀', name: 'crabs' } },
-  { a: { emoji: '⚽', name: 'balls' }, b: { emoji: '🏀', name: 'basketballs' } },
-  { a: { emoji: '🍪', name: 'cookies' }, b: { emoji: '🧁', name: 'cupcakes' } },
-];
-
-function makeWhatIsMoreQuestion() {
-  const pair = MORE_ITEM_PAIRS[randInt(0, MORE_ITEM_PAIRS.length - 1)];
-  const aCount = randInt(2, 12);
-  let bCount = randInt(2, 12);
-  while (bCount === aCount) bCount = randInt(2, 12);
-
-  const correct = aCount > bCount
-    ? pair.a.emoji + ' ' + pair.a.name
-    : pair.b.emoji + ' ' + pair.b.name;
-
-  return {
-    type: 'what-is-more',
-    scene: repeat(pair.a.emoji, aCount) + '\n' + repeat(pair.b.emoji, bCount),
-    question: 'What is MORE?',
-    correct,
-    choices: shuffle([
-      pair.a.emoji + ' ' + pair.a.name,
-      pair.b.emoji + ' ' + pair.b.name,
-    ]),
-    wrongAnim: 'tumble',
-    wrongMsg: 'Whoops! Milo mixed up the bigger group! 🤹',
-    correctMsg: 'Awesome! You found what is more! 🎉',
-  };
-}
-
-/* ── 6. Compound Crunch ─────────────────────── */
-function makeCompoundQuestion() {
-  const a = randInt(1, 10);
-  const b = randInt(1, 10);
-  const c = randInt(1, a + b);
-  const correct = a + b - c;
-
-  const distractors = new Set();
-  while (distractors.size < 3) {
-    const d = correct + randInt(-4, 4);
-    if (d !== correct && d >= 0 && d <= 25) distractors.add(d);
-  }
-
-  return {
-    type: 'compound',
-    scene: a + '  ➕  ' + b + '  ➖  ' + c,
-    question: 'What is ' + a + ' + ' + b + ' - ' + c + '?',
-    correct,
-    choices: shuffle([correct, ...distractors]),
-    wrongAnim: 'launch',
-    wrongMsg: 'Oops! Milo lost track in the two-step math! 😵',
-    correctMsg: 'Great two-step solving! Milo is impressed! 🐵🧠',
-  };
-}
-
-/* ── 7. Weight Trouble ─────────────────────── */
+/* ── 4. Weight Trouble ─────────────────────── */
 const WEIGHT_PAIRS = [
   { a: { emoji: '🧲', label: 'a magnet'        }, b: { emoji: '🪶', label: 'a feather'        } },
   { a: { emoji: '🪨', label: 'a big rock'      }, b: { emoji: '🍃', label: 'a leaf'           } },
@@ -368,9 +215,6 @@ const MINI_GAMES = {
   counting: { title: 'Counting Chaos 🎈',   makeQuestion: makeCountingQuestion  },
   measuring:{ title: 'Measuring Mayhem 📏', makeQuestion: makeMeasuringQuestion },
   sharing:  { title: 'Sharing Snacks 🍌',   makeQuestion: makeSharingQuestion   },
-  whoMore:  { title: 'Who Has More? 🙋',    makeQuestion: makeWhoHasMoreQuestion },
-  whatMore: { title: 'What Is More? 👀',    makeQuestion: makeWhatIsMoreQuestion },
-  compound: { title: 'Compound Crunch ➕➖', makeQuestion: makeCompoundQuestion   },
   weight:   { title: 'Weight Trouble ⚖️',   makeQuestion: makeWeightQuestion    },
 };
 
@@ -402,8 +246,7 @@ function renderQuestion() {
 
   // Reset Milo animation
   const miloEl = document.getElementById('milo-char');
-  miloEl.className = 'milo-character';
-  void miloEl.offsetWidth; // reflow
+  playMiloAnimation(miloEl, 'idle');
 
   // Scene
   const sceneEl = document.getElementById('question-scene');
@@ -472,9 +315,8 @@ function handleAnswer(chosen) {
 
   // Milo animation
   const miloEl = document.getElementById('milo-char');
-  miloEl.className = 'milo-character';
-  void miloEl.offsetWidth;
-  miloEl.classList.add(isCorrect ? 'celebrate' : (q.wrongAnim || 'tumble'));
+  // Keep legacy per-game wrong animations while defaulting to generic failure.
+  playMiloAnimation(miloEl, isCorrect ? 'success' : (q.wrongAnim || 'failure'));
 
   if (isCorrect) gameState.score++;
   updateScoreDisplay();
@@ -487,7 +329,6 @@ function handleAnswer(chosen) {
   } else {
     fb.className = 'feedback-banner wrong';
     fb.innerHTML = '<span class="feedback-icon">😬</span>' + q.wrongMsg;
-    playNextFailSound();
   }
 
   // Show next / finish button
@@ -552,7 +393,6 @@ function startGame(gameKey) {
 //  DOM ready
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  scanFailSoundsDirectory();
 
   // Welcome → Menu
   document.getElementById('play-btn').addEventListener('click', () => {
@@ -584,6 +424,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Start on welcome screen
   showScreen('welcome-screen');
+
+  // Welcome screen animation demo
+  const demoEl = document.getElementById('milo-demo-char');
+  const demoButtons = [
+    { id: 'demo-idle-btn', animation: 'idle' },
+    { id: 'demo-success-btn', animation: 'success' },
+    { id: 'demo-failure-btn', animation: 'failure' },
+  ];
+  demoButtons.forEach(({ id, animation }) => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', () => playMiloAnimation(demoEl, animation));
+  });
 });
 
 // ─────────────────────────────────────────────
