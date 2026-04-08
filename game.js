@@ -216,6 +216,7 @@ const MINI_GAMES = {
 function buildRound(gameKey) {
   const mk = MINI_GAMES[gameKey].makeQuestion;
   if (gameKey === 'weight') {
+    if (WEIGHT_PAIRS.length === 0) return [];
     const questions = [];
     let pairPool = shuffle([...WEIGHT_PAIRS]);
     while (questions.length < gameState.questionsPerRound) {
