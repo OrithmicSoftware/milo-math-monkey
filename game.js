@@ -20,7 +20,7 @@ const RTL_LANGUAGES = new Set(['he', 'ar']);
 
 const I18N = {
   en: {
-    welcomeTitle: 'Milo the<br>Math Monkey',
+    welcomeTitle: 'Milo the\nMath Monkey',
     welcomeSlogan: '"Count it right… or watch Milo take a tumble!"',
     languageLabel: 'Language',
     menuTitle: '🐵 Choose a Mini-Game!',
@@ -84,7 +84,7 @@ const I18N = {
     envBadge: '🚧 STAGING ENVIRONMENT — not for production use 🚧',
   },
   ru: {
-    welcomeTitle: 'Мило —<br>Математическая Обезьянка',
+    welcomeTitle: 'Мило —\nМатематическая Обезьянка',
     welcomeSlogan: '"Считай правильно… или Мило снова попадёт в беду!"',
     languageLabel: 'Язык',
     menuTitle: '🐵 Выбери мини-игру!',
@@ -97,7 +97,7 @@ const I18N = {
       playAgain: '🔄 Играть снова',
       chooseGame: '🎮 Выбрать игру',
     },
-    labels: { score: '⭐ Счёт: {score} / {total}', questionCounter: 'В {current} / {total}' },
+    labels: { score: '⭐ Счёт: {score} / {total}', questionCounter: 'Вопрос {current} / {total}' },
     cards: {
       counting: { title: 'Счётный хаос', desc: 'Сосчитай предметы, пока Мило не улетел с шариками!', badge: 'Счёт 1–20' },
       measuring: { title: 'Измерительный переполох', desc: 'Ошибись — и Мило плюхнется в желе!', badge: 'Размер и сравнение' },
@@ -145,7 +145,7 @@ const I18N = {
     envBadge: '🚧 СРЕДА STAGING — не для продакшена 🚧',
   },
   he: {
-    welcomeTitle: 'מילו קוף<br>המתמטיקה',
+    welcomeTitle: 'מילו קוף\nהמתמטיקה',
     welcomeSlogan: '"תספור נכון… או שתראו את מילו מסתבך!"',
     languageLabel: 'שפה',
     menuTitle: '🐵 בחרו מיני-משחק!',
@@ -158,7 +158,7 @@ const I18N = {
       playAgain: '🔄 משחקים שוב',
       chooseGame: '🎮 בוחרים משחק',
     },
-    labels: { score: '⭐ ניקוד: {score} / {total}', questionCounter: 'ש {current} / {total}' },
+    labels: { score: '⭐ ניקוד: {score} / {total}', questionCounter: 'שאלה {current} / {total}' },
     cards: {
       counting: { title: 'בלגן ספירה', desc: 'ספרו את הפריטים לפני שמילו יעוף עם יותר מדי בלונים!', badge: 'ספירה 1–20' },
       measuring: { title: 'מהומת מדידה', desc: 'טעות — ומילו נופל ישר לג׳לי!', badge: 'גודל והשוואה' },
@@ -206,7 +206,7 @@ const I18N = {
     envBadge: '🚧 סביבת STAGING — לא לשימוש בייצור 🚧',
   },
   ar: {
-    welcomeTitle: 'ميلو قرد<br>الرياضيات',
+    welcomeTitle: 'ميلو قرد\nالرياضيات',
     welcomeSlogan: '"عدّها جيدًا… وإلا سيتعثر ميلو!"',
     languageLabel: 'اللغة',
     menuTitle: '🐵 اختر لعبة صغيرة!',
@@ -219,7 +219,7 @@ const I18N = {
       playAgain: '🔄 العب مرة أخرى',
       chooseGame: '🎮 اختر لعبة',
     },
-    labels: { score: '⭐ النتيجة: {score} / {total}', questionCounter: 'س {current} / {total}' },
+    labels: { score: '⭐ النتيجة: {score} / {total}', questionCounter: 'سؤال {current} / {total}' },
     cards: {
       counting: { title: 'فوضى العد', desc: 'عدّ العناصر قبل أن يأخذ ميلو بالونات كثيرة ويطير!', badge: 'العد من 1 إلى 20' },
       measuring: { title: 'فوضى القياس', desc: 'إجابة خاطئة وميلو يسقط في الجيلي!', badge: 'الحجم والمقارنة' },
@@ -269,14 +269,16 @@ const I18N = {
 };
 
 function getNestedTranslation(path, fallbackLanguage) {
-  return path.split('.').reduce((obj, key) => (obj && key in obj ? obj[key] : undefined), I18N[fallbackLanguage]);
+  const base = I18N[fallbackLanguage];
+  if (!base) return undefined;
+  return path.split('.').reduce((obj, key) => (obj && key in obj ? obj[key] : undefined), base);
 }
 
 function interpolate(text, params) {
-  return Object.entries(params || {}).reduce(
-    (result, [key, value]) => result.replaceAll('{' + key + '}', String(value)),
-    text
-  );
+  const values = params || {};
+  return text.replace(/\{([^}]+)\}/g, (full, key) => (
+    key in values ? String(values[key]) : full
+  ));
 }
 
 function t(path, params) {
@@ -501,21 +503,17 @@ function getGameTitle(gameKey) {
   return t(MINI_GAMES[gameKey].titleKey);
 }
 
-function setText(id, value, asHtml) {
+function setText(id, value) {
   const el = document.getElementById(id);
   if (!el) return;
-  if (asHtml) {
-    el.innerHTML = value;
-  } else {
-    el.textContent = value;
-  }
+  el.textContent = value;
 }
 
 function applyLanguage() {
   document.documentElement.lang = gameState.language;
   document.documentElement.dir = RTL_LANGUAGES.has(gameState.language) ? 'rtl' : 'ltr';
 
-  setText('welcome-title', t('welcomeTitle'), true);
+  setText('welcome-title', t('welcomeTitle'));
   setText('welcome-slogan', t('welcomeSlogan'));
   setText('language-label', t('languageLabel'));
   setText('play-btn', t('buttons.play'));
@@ -720,6 +718,8 @@ document.addEventListener('DOMContentLoaded', () => {
     gameState.language = storedLanguage;
   }
 
+  applyLanguage();
+
   const languageSelect = document.getElementById('language-select');
   if (languageSelect) {
     languageSelect.value = gameState.language;
@@ -763,8 +763,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('choose-game-btn').addEventListener('click', () => {
     showScreen('menu-screen');
   });
-
-  applyLanguage();
 
   // Start on welcome screen
   showScreen('welcome-screen');
