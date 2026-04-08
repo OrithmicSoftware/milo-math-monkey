@@ -35,13 +35,14 @@ function repeat(char, n) {
 }
 
 const FAIL_SOUNDS_DIR = 'sounds/fail/';
+const FAIL_SOUNDS_MANIFEST = FAIL_SOUNDS_DIR + 'manifest.json';
 const FALLBACK_FAIL_SOUNDS = [
   'universfield-cartoon-fail-trumpet-278822.mp3',
   'olivia_parker-fail-2-demo-306647.mp3',
   'u_8g40a9z0la-fail-234710.mp3',
   'x_bass6668-funny-meow-110120.mp3',
   'mangaletp-funny-laughing-406018.mp3',
-].map(file => FAIL_SOUNDS_DIR + encodeURIComponent(file));
+].map(file => FAIL_SOUNDS_DIR + file);
 
 const failSoundState = {
   urls: [...FALLBACK_FAIL_SOUNDS],
@@ -63,6 +64,21 @@ async function scanFailSoundsDirectory() {
   failSoundState.didScanDirectory = true;
 
   try {
+    const manifestResponse = await fetch(FAIL_SOUNDS_MANIFEST, { cache: 'no-store' });
+    if (manifestResponse.ok) {
+      const manifest = await manifestResponse.json();
+      if (Array.isArray(manifest)) {
+        const fromManifest = manifest
+          .map(fileName => normalizeFailSoundUrl(fileName))
+          .filter(Boolean);
+        if (fromManifest.length > 0) {
+          failSoundState.urls = [...new Set(fromManifest)];
+          failSoundState.nextIndex = 0;
+          return;
+        }
+      }
+    }
+
     const response = await fetch(FAIL_SOUNDS_DIR, { cache: 'no-store' });
     if (!response.ok) return;
 
@@ -87,7 +103,7 @@ async function scanFailSoundsDirectory() {
 function playNextFailSound() {
   if (failSoundState.urls.length === 0 || typeof Audio !== 'function') return;
   const url = failSoundState.urls[failSoundState.nextIndex % failSoundState.urls.length];
-  failSoundState.nextIndex = (failSoundState.nextIndex + 1) % failSoundState.urls.length;
+  failSoundState.nextIndex += 1;
 
   const audio = new Audio(url);
   audio.play().catch(() => {
