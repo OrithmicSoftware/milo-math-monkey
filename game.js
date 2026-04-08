@@ -34,6 +34,14 @@ function repeat(char, n) {
   return Array(n).fill(char).join(' ');
 }
 
+function playMiloAnimation(el, animationName) {
+  if (!el) return;
+  el.className = 'milo-character';
+  // Reflow allows restarting CSS animations when switching states.
+  void el.offsetWidth;
+  el.classList.add(animationName);
+}
+
 // ─────────────────────────────────────────────
 //  Screen navigation
 // ─────────────────────────────────────────────
@@ -231,8 +239,7 @@ function renderQuestion() {
 
   // Reset Milo animation
   const miloEl = document.getElementById('milo-char');
-  miloEl.className = 'milo-character';
-  void miloEl.offsetWidth; // reflow
+  playMiloAnimation(miloEl, 'idle');
 
   // Scene
   const sceneEl = document.getElementById('question-scene');
@@ -301,9 +308,8 @@ function handleAnswer(chosen) {
 
   // Milo animation
   const miloEl = document.getElementById('milo-char');
-  miloEl.className = 'milo-character';
-  void miloEl.offsetWidth;
-  miloEl.classList.add(isCorrect ? 'celebrate' : (q.wrongAnim || 'tumble'));
+  // Keep legacy per-game wrong animations while defaulting to generic failure.
+  playMiloAnimation(miloEl, isCorrect ? 'success' : (q.wrongAnim || 'failure'));
 
   if (isCorrect) gameState.score++;
   updateScoreDisplay();
@@ -411,6 +417,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Start on welcome screen
   showScreen('welcome-screen');
+
+  // Welcome screen animation demo
+  const demoEl = document.getElementById('milo-demo-char');
+  const demoButtons = [
+    { id: 'demo-idle-btn', animation: 'idle' },
+    { id: 'demo-success-btn', animation: 'success' },
+    { id: 'demo-failure-btn', animation: 'failure' },
+  ];
+  demoButtons.forEach(({ id, animation }) => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', () => playMiloAnimation(demoEl, animation));
+  });
 });
 
 // ─────────────────────────────────────────────
