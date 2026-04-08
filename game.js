@@ -951,14 +951,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  const languageSelect = document.getElementById('language-select');
-  if (languageSelect) {
-    languageSelect.value = gameState.language;
-    languageSelect.addEventListener('change', event => {
-      setLanguage(event.target.value);
-    });
-  }
-
   // Welcome → Menu
   document.getElementById('play-btn').addEventListener('click', () => {
     showScreen('menu-screen');
