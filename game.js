@@ -124,7 +124,7 @@ const SNACK_ITEMS = [
 
 function makeSharingQuestion() {
   const item  = SNACK_ITEMS[randInt(0, SNACK_ITEMS.length - 1)];
-  const mode  = randInt(0, 2); // 0=addition  1=subtraction  2=sharing
+  const mode  = randInt(0, 2); // 0=addition  1=subtraction  2=division
 
   let question, correct, scene;
 
