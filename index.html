@@ -18,15 +18,6 @@
     <p class="game-slogan">"Count it right… or watch Milo take a tumble!"</p>
     <div class="number-decoration" aria-hidden="true">1 2 3 4 5</div>
     <button id="play-btn" class="btn btn-play">🎮 Play!</button>
-    <div class="animation-demo" aria-label="Milo animation demo">
-      <p class="animation-demo-title">Try Milo's animations:</p>
-      <span id="milo-demo-char" class="milo-character idle" aria-label="Milo animation demo character">🐵</span>
-      <div class="animation-demo-buttons">
-        <button id="demo-idle-btn" class="demo-btn" type="button">Idle</button>
-        <button id="demo-success-btn" class="demo-btn" type="button">Success</button>
-        <button id="demo-failure-btn" class="demo-btn" type="button">Failure</button>
-      </div>
-    </div>
   </section>
 
   <!-- ══════════════════════════════════════
@@ -69,10 +60,11 @@
       </div>
 
     </div>
+    <button id="open-animation-demo-btn" class="btn btn-primary" style="margin-top:18px;">🐵 Animation Studio</button>
   </section>
 
   <!-- ══════════════════════════════════════
-       GAME SCREEN
+        GAME SCREEN
   ══════════════════════════════════════ -->
   <section id="game-screen" class="screen">
 
@@ -83,7 +75,10 @@
 
     <!-- Milo + question scene -->
     <div class="milo-stage">
-      <span id="milo-char" class="milo-character" aria-label="Milo the monkey">🐵</span>
+      <div id="milo-char" class="milo-character" aria-label="Milo the monkey">
+        <div class="milo-head">🐵</div>
+        <div class="milo-body"></div>
+      </div>
       <div class="question-scene" id="question-scene"></div>
       <p class="question-text" id="question-text"></p>
     </div>
@@ -98,6 +93,26 @@
     <button id="next-btn" class="btn btn-next" style="display:none; margin-top:14px;">Next Question ➡️</button>
     <button id="back-to-menu-btn" class="btn btn-back">⬅ Back to Menu</button>
 
+  </section>
+
+  <!-- ══════════════════════════════════════
+       ANIMATION STUDIO SCREEN
+  ══════════════════════════════════════ -->
+  <section id="animation-screen" class="screen">
+    <h2 class="results-title">🐵 Milo Animation Studio</h2>
+    <p class="results-msg" style="margin-bottom:12px;">Preview Milo's dance, fall, and jumping-for-joy animations.</p>
+    <div class="milo-stage">
+      <div id="milo-demo-char" class="milo-character dancing" aria-label="Milo animation demo character">
+        <div class="milo-head">🐵</div>
+        <div class="milo-body"></div>
+      </div>
+      <div class="animation-demo-buttons" style="justify-content:center;">
+        <button id="demo-dance-btn" class="demo-btn" type="button">Dance</button>
+        <button id="demo-fall-btn" class="demo-btn" type="button">Fall</button>
+        <button id="demo-joy-btn" class="demo-btn" type="button">Jump in Joy</button>
+      </div>
+    </div>
+    <button id="back-from-animation-btn" class="btn btn-back">⬅ Back to Menu</button>
   </section>
 
   <!-- ══════════════════════════════════════

@@ -246,7 +246,7 @@ function renderQuestion() {
 
   // Reset Milo animation
   const miloEl = document.getElementById('milo-char');
-  playMiloAnimation(miloEl, 'idle');
+  playMiloAnimation(miloEl, 'dancing');
 
   // Scene
   const sceneEl = document.getElementById('question-scene');
@@ -315,8 +315,7 @@ function handleAnswer(chosen) {
 
   // Milo animation
   const miloEl = document.getElementById('milo-char');
-  // Keep legacy per-game wrong animations while defaulting to generic failure.
-  playMiloAnimation(miloEl, isCorrect ? 'success' : (q.wrongAnim || 'failure'));
+  playMiloAnimation(miloEl, isCorrect ? 'jumping-joy' : 'falling');
 
   if (isCorrect) gameState.score++;
   updateScoreDisplay();
@@ -399,6 +398,12 @@ document.addEventListener('DOMContentLoaded', () => {
     showScreen('menu-screen');
   });
 
+  // Menu → animation studio
+  document.getElementById('open-animation-demo-btn').addEventListener('click', () => {
+    showScreen('animation-screen');
+    playMiloAnimation(document.getElementById('milo-demo-char'), 'dancing');
+  });
+
   // Menu → mini-games
   document.querySelectorAll('.game-card').forEach(card => {
     card.addEventListener('click', () => startGame(card.dataset.game));
@@ -422,15 +427,20 @@ document.addEventListener('DOMContentLoaded', () => {
     showScreen('menu-screen');
   });
 
+  // Animation studio → menu
+  document.getElementById('back-from-animation-btn').addEventListener('click', () => {
+    showScreen('menu-screen');
+  });
+
   // Start on welcome screen
   showScreen('welcome-screen');
 
   // Welcome screen animation demo
   const demoEl = document.getElementById('milo-demo-char');
   const demoButtons = [
-    { id: 'demo-idle-btn', animation: 'idle' },
-    { id: 'demo-success-btn', animation: 'success' },
-    { id: 'demo-failure-btn', animation: 'failure' },
+    { id: 'demo-dance-btn', animation: 'dancing' },
+    { id: 'demo-fall-btn', animation: 'falling' },
+    { id: 'demo-joy-btn', animation: 'jumping-joy' },
   ];
   demoButtons.forEach(({ id, animation }) => {
     const btn = document.getElementById(id);
