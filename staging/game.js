@@ -5,7 +5,7 @@
 // ─────────────────────────────────────────────
 const gameState = {
   activeGame: null,
-  language: 'en',
+  activeLevelIndex: 0,
   score: 0,
   totalAnswered: 0,
   questionsPerRound: 5,
@@ -13,284 +13,22 @@ const gameState = {
   questions: [],
   currentQ: null,
   answered: false,
+  unlockedLevelCount: 1,
+  completedLevels: [],
 };
-
-const SUPPORTED_LANGUAGES = ['en', 'ru', 'he', 'ar'];
-const RTL_LANGUAGES = new Set(['he', 'ar']);
-
-const I18N = {
-  en: {
-    welcomeTitle: 'Milo the\nMath Monkey',
-    welcomeSlogan: '"Count it right… or watch Milo take a tumble!"',
-    languageLabel: 'Language',
-    menuTitle: '🐵 Choose a Mini-Game!',
-    aria: { answers: 'Answer choices' },
-    buttons: {
-      play: '🎮 Play!',
-      nextQuestion: 'Next Question ➡️',
-      seeResults: 'See Results 🏆',
-      backToMenu: '⬅ Back to Menu',
-      playAgain: '🔄 Play Again',
-      chooseGame: '🎮 Choose Game',
-    },
-    labels: {
-      score: '⭐ Score: {score} / {total}',
-      questionCounter: 'Q {current} / {total}',
-    },
-    cards: {
-      counting: { title: 'Counting Chaos', desc: 'Count the items before Milo grabs too many balloons and flies away!', badge: 'Counting 1–20' },
-      measuring: { title: 'Measuring Mayhem', desc: 'Get it wrong and Milo falls face-first into the jelly!', badge: 'Size & Comparison' },
-      sharing: { title: 'Sharing Snacks', desc: 'Wrong answer and the characters roll away with ALL the snacks!', badge: 'Addition & Subtraction' },
-      weight: { title: 'Weight Trouble', desc: 'Wrong weight comparison launches Milo off the seesaw — BOING!', badge: 'Heavier & Lighter' },
-    },
-    games: {
-      counting: { title: 'Counting Chaos 🎈' },
-      measuring: { title: 'Measuring Mayhem 📏' },
-      sharing: { title: 'Sharing Snacks 🍌' },
-      weight: { title: 'Weight Trouble ⚖️' },
-    },
-    items: {
-      counting: { balloons: 'balloons', bananas: 'bananas', stars: 'stars', bees: 'bees', apples: 'apples', flowers: 'flowers' },
-      snacks: { bananas: 'bananas', cookies: 'cookies', berries: 'berries', peanuts: 'peanuts', candies: 'candies' },
-      measureLabels: { bigTree: 'a big tree', tinySprout: 'a tiny sprout', elephant: 'an elephant', mouse: 'a mouse', house: 'a house', tent: 'a tent', train: 'a train', bicycle: 'a bicycle', watermelon: 'a watermelon', grapes: 'grapes', dinosaur: 'a dinosaur', bunny: 'a bunny', ocean: 'the ocean', bathtub: 'a bathtub', sun: 'the sun', moon: 'the moon' },
-      weightLabels: { magnet: 'a magnet', feather: 'a feather', bigRock: 'a big rock', leaf: 'a leaf', books: 'books', balloon: 'a balloon', toyCar: 'a toy car', teddyBear: 'a teddy bear', apple: 'an apple', strawberry: 'a strawberry', football: 'a football', pingPongBall: 'a ping pong ball', lion: 'a lion', hamster: 'a hamster' },
-    },
-    questions: {
-      counting: 'How many {item} does Milo see? 🐵',
-      measuringBigger: 'Which is BIGGER: {a} or {b}?',
-      measuringSmaller: 'Which is SMALLER: {a} or {b}?',
-      sharingAdd: 'Milo has {a} {item}, then finds {b} more. How many altogether?',
-      sharingSub: 'Milo has {total} {item} and eats {eaten}. How many are left?',
-      weightHeavier: 'Which is HEAVIER: {a} or {b}?',
-      weightLighter: 'Which is LIGHTER: {a} or {b}?',
-    },
-    feedback: {
-      countingWrong: 'Oh no! Milo grabbed too many balloons and FLEW AWAY! 🎈🎈🎈',
-      countingCorrect: 'Great counting! Milo lands safely! 🐵🎉',
-      measuringWrong: 'Oops! Milo measured wrong and fell into the jelly! 🫙💥',
-      measuringCorrect: 'Perfect measuring! Milo stays dry! 📏🐵✨',
-      sharingWrong: 'Uh oh! Wrong share! The friends rolled away with ALL the snacks! 🍌🎲',
-      sharingCorrect: 'Sharing is caring! Everyone gets their snacks! 🐵🍌🎉',
-      weightWrong: 'BOING! Wrong weight — Milo got launched off the seesaw! 🪂',
-      weightCorrect: 'The seesaw balances! Great thinking! ⚖️🐵🎊',
-    },
-    results: {
-      title: 'Round Complete!',
-      scoreText: 'You got {score} out of {total} correct!',
-      goodEffort: 'Good effort! Keep practicing with Milo!',
-      perfect: 'PERFECT SCORE! Milo is so proud of you! 🐵🎊',
-      great: 'Great job! You are getting really good at math! 🐵',
-    },
-    envBadge: '🚧 STAGING ENVIRONMENT — not for production use 🚧',
-  },
-  ru: {
-    welcomeTitle: 'Мило —\nМатематическая Обезьянка',
-    welcomeSlogan: '"Считай правильно… или Мило снова попадёт в беду!"',
-    languageLabel: 'Язык',
-    menuTitle: '🐵 Выбери мини-игру!',
-    aria: { answers: 'Варианты ответа' },
-    buttons: {
-      play: '🎮 Играть!',
-      nextQuestion: 'Следующий вопрос ➡️',
-      seeResults: 'Показать результат 🏆',
-      backToMenu: '⬅ Назад в меню',
-      playAgain: '🔄 Играть снова',
-      chooseGame: '🎮 Выбрать игру',
-    },
-    labels: { score: '⭐ Счёт: {score} / {total}', questionCounter: 'Вопрос {current} / {total}' },
-    cards: {
-      counting: { title: 'Счётный хаос', desc: 'Сосчитай предметы, пока Мило не улетел с шариками!', badge: 'Счёт 1–20' },
-      measuring: { title: 'Измерительный переполох', desc: 'Ошибись — и Мило плюхнется в желе!', badge: 'Размер и сравнение' },
-      sharing: { title: 'Делим угощения', desc: 'Неверный ответ — и друзья укатят со ВСЕМИ вкусняшками!', badge: 'Сложение и вычитание' },
-      weight: { title: 'Весовые неприятности', desc: 'Ошибка в сравнении веса — и Мило улетает с качелей!', badge: 'Тяжелее и легче' },
-    },
-    games: {
-      counting: { title: 'Счётный хаос 🎈' },
-      measuring: { title: 'Измерительный переполох 📏' },
-      sharing: { title: 'Делим угощения 🍌' },
-      weight: { title: 'Весовые неприятности ⚖️' },
-    },
-    items: {
-      counting: { balloons: 'шариков', bananas: 'бананов', stars: 'звёзд', bees: 'пчёл', apples: 'яблок', flowers: 'цветов' },
-      snacks: { bananas: 'бананов', cookies: 'печенек', berries: 'ягод', peanuts: 'орешков', candies: 'конфет' },
-      measureLabels: { bigTree: 'большое дерево', tinySprout: 'маленький росток', elephant: 'слон', mouse: 'мышка', house: 'дом', tent: 'палатка', train: 'поезд', bicycle: 'велосипед', watermelon: 'арбуз', grapes: 'виноград', dinosaur: 'динозавр', bunny: 'кролик', ocean: 'океан', bathtub: 'ванна', sun: 'солнце', moon: 'луна' },
-      weightLabels: { magnet: 'магнит', feather: 'перо', bigRock: 'большой камень', leaf: 'лист', books: 'книги', balloon: 'шарик', toyCar: 'игрушечная машинка', teddyBear: 'плюшевый мишка', apple: 'яблоко', strawberry: 'клубника', football: 'футбольный мяч', pingPongBall: 'мячик для пинг-понга', lion: 'лев', hamster: 'хомяк' },
-    },
-    questions: {
-      counting: 'Сколько {item} видит Мило? 🐵',
-      measuringBigger: 'Что БОЛЬШЕ: {a} или {b}?',
-      measuringSmaller: 'Что МЕНЬШЕ: {a} или {b}?',
-      sharingAdd: 'У Мило {a} {item}, потом он находит ещё {b}. Сколько стало всего?',
-      sharingSub: 'У Мило {total} {item}, и он съедает {eaten}. Сколько осталось?',
-      weightHeavier: 'Что ТЯЖЕЛЕЕ: {a} или {b}?',
-      weightLighter: 'Что ЛЕГЧЕ: {a} или {b}?',
-    },
-    feedback: {
-      countingWrong: 'О нет! Мило схватил слишком много шариков и УЛЕТЕЛ! 🎈🎈🎈',
-      countingCorrect: 'Отличный счёт! Мило приземлился безопасно! 🐵🎉',
-      measuringWrong: 'Упс! Мило ошибся в измерении и упал в желе! 🫙💥',
-      measuringCorrect: 'Отлично измерено! Мило сухой и довольный! 📏🐵✨',
-      sharingWrong: 'Ой-ой! Неправильно поделили — друзья укатили со всеми вкусняшками! 🍌🎲',
-      sharingCorrect: 'Делиться — это здорово! Всем достались угощения! 🐵🍌🎉',
-      weightWrong: 'БУМ! Ошибка в весе — Мило улетел с качелей! 🪂',
-      weightCorrect: 'Качели в равновесии! Отличное мышление! ⚖️🐵🎊',
-    },
-    results: {
-      title: 'Раунд завершён!',
-      scoreText: 'Ты ответил правильно на {score} из {total}!',
-      goodEffort: 'Хорошая попытка! Продолжай тренироваться с Мило!',
-      perfect: 'ИДЕАЛЬНО! Мило очень тобой гордится! 🐵🎊',
-      great: 'Отличная работа! Ты здорово считаешь! 🐵',
-    },
-    envBadge: '🚧 СРЕДА STAGING — не для продакшена 🚧',
-  },
-  he: {
-    welcomeTitle: 'מילו קוף\nהמתמטיקה',
-    welcomeSlogan: '"תספור נכון… או שתראו את מילו מסתבך!"',
-    languageLabel: 'שפה',
-    menuTitle: '🐵 בחרו מיני-משחק!',
-    aria: { answers: 'אפשרויות תשובה' },
-    buttons: {
-      play: '🎮 משחקים!',
-      nextQuestion: 'שאלה הבאה ➡️',
-      seeResults: 'לתוצאות 🏆',
-      backToMenu: '⬅ חזרה לתפריט',
-      playAgain: '🔄 משחקים שוב',
-      chooseGame: '🎮 בוחרים משחק',
-    },
-    labels: { score: '⭐ ניקוד: {score} / {total}', questionCounter: 'שאלה {current} / {total}' },
-    cards: {
-      counting: { title: 'בלגן ספירה', desc: 'ספרו את הפריטים לפני שמילו יעוף עם יותר מדי בלונים!', badge: 'ספירה 1–20' },
-      measuring: { title: 'מהומת מדידה', desc: 'טעות — ומילו נופל ישר לג׳לי!', badge: 'גודל והשוואה' },
-      sharing: { title: 'מחלקים חטיפים', desc: 'תשובה שגויה — והחברים מתגלגלים עם כל החטיפים!', badge: 'חיבור וחיסור' },
-      weight: { title: 'צרות משקל', desc: 'השוואת משקל שגויה מעיפה את מילו מהנדנדה!', badge: 'כבד וקל' },
-    },
-    games: {
-      counting: { title: 'בלגן ספירה 🎈' },
-      measuring: { title: 'מהומת מדידה 📏' },
-      sharing: { title: 'מחלקים חטיפים 🍌' },
-      weight: { title: 'צרות משקל ⚖️' },
-    },
-    items: {
-      counting: { balloons: 'בלונים', bananas: 'בננות', stars: 'כוכבים', bees: 'דבורים', apples: 'תפוחים', flowers: 'פרחים' },
-      snacks: { bananas: 'בננות', cookies: 'עוגיות', berries: 'פירות יער', peanuts: 'בוטנים', candies: 'סוכריות' },
-      measureLabels: { bigTree: 'עץ גדול', tinySprout: 'נבט קטן', elephant: 'פיל', mouse: 'עכבר', house: 'בית', tent: 'אוהל', train: 'רכבת', bicycle: 'אופניים', watermelon: 'אבטיח', grapes: 'ענבים', dinosaur: 'דינוזאור', bunny: 'ארנב', ocean: 'האוקיינוס', bathtub: 'אמבטיה', sun: 'השמש', moon: 'הירח' },
-      weightLabels: { magnet: 'מגנט', feather: 'נוצה', bigRock: 'אבן גדולה', leaf: 'עלה', books: 'ספרים', balloon: 'בלון', toyCar: 'מכונית צעצוע', teddyBear: 'דובון', apple: 'תפוח', strawberry: 'תות', football: 'כדורגל', pingPongBall: 'כדור פינג-פונג', lion: 'אריה', hamster: 'אוגר' },
-    },
-    questions: {
-      counting: 'כמה {item} מילו רואה? 🐵',
-      measuringBigger: 'מה יותר גדול: {a} או {b}?',
-      measuringSmaller: 'מה יותר קטן: {a} או {b}?',
-      sharingAdd: 'למילו יש {a} {item}, ואז הוא מוצא עוד {b}. כמה יש בסך הכול?',
-      sharingSub: 'למילו יש {total} {item} והוא אוכל {eaten}. כמה נשאר?',
-      weightHeavier: 'מה יותר כבד: {a} או {b}?',
-      weightLighter: 'מה יותר קל: {a} או {b}?',
-    },
-    feedback: {
-      countingWrong: 'אוי לא! מילו לקח יותר מדי בלונים ו... עף! 🎈🎈🎈',
-      countingCorrect: 'ספירה מעולה! מילו נוחת בבטחה! 🐵🎉',
-      measuringWrong: 'אופס! מילו טעה במדידה ונפל לג׳לי! 🫙💥',
-      measuringCorrect: 'מדידה מושלמת! מילו נשאר יבש! 📏🐵✨',
-      sharingWrong: 'אוי! חילוק לא נכון — החברים התגלגלו עם כל החטיפים! 🍌🎲',
-      sharingCorrect: 'לחלק זה כיף! לכולם יש חטיפים! 🐵🍌🎉',
-      weightWrong: 'בווינג! טעות במשקל — מילו נזרק מהנדנדה! 🪂',
-      weightCorrect: 'הנדנדה מאוזנת! חשיבה נהדרת! ⚖️🐵🎊',
-    },
-    results: {
-      title: 'הסבב הושלם!',
-      scoreText: 'ענית נכון על {score} מתוך {total}!',
-      goodEffort: 'מאמץ יפה! המשיכו להתאמן עם מילו!',
-      perfect: 'מושלם! מילו ממש גאה בכם! 🐵🎊',
-      great: 'עבודה נהדרת! אתם משתפרים מאוד במתמטיקה! 🐵',
-    },
-    envBadge: '🚧 סביבת STAGING — לא לשימוש בייצור 🚧',
-  },
-  ar: {
-    welcomeTitle: 'ميلو قرد\nالرياضيات',
-    welcomeSlogan: '"عدّها جيدًا… وإلا سيتعثر ميلو!"',
-    languageLabel: 'اللغة',
-    menuTitle: '🐵 اختر لعبة صغيرة!',
-    aria: { answers: 'خيارات الإجابة' },
-    buttons: {
-      play: '🎮 العب!',
-      nextQuestion: 'السؤال التالي ➡️',
-      seeResults: 'عرض النتائج 🏆',
-      backToMenu: '⬅ العودة للقائمة',
-      playAgain: '🔄 العب مرة أخرى',
-      chooseGame: '🎮 اختر لعبة',
-    },
-    labels: { score: '⭐ النتيجة: {score} / {total}', questionCounter: 'سؤال {current} / {total}' },
-    cards: {
-      counting: { title: 'فوضى العد', desc: 'عدّ العناصر قبل أن يأخذ ميلو بالونات كثيرة ويطير!', badge: 'العد من 1 إلى 20' },
-      measuring: { title: 'فوضى القياس', desc: 'إجابة خاطئة وميلو يسقط في الجيلي!', badge: 'الحجم والمقارنة' },
-      sharing: { title: 'تقاسم الوجبات', desc: 'إجابة خاطئة والأصدقاء يهربون بكل الوجبات!', badge: 'الجمع والطرح' },
-      weight: { title: 'مشكلة الوزن', desc: 'مقارنة وزن خاطئة تطلق ميلو من الأرجوحة!', badge: 'أثقل وأخف' },
-    },
-    games: {
-      counting: { title: 'فوضى العد 🎈' },
-      measuring: { title: 'فوضى القياس 📏' },
-      sharing: { title: 'تقاسم الوجبات 🍌' },
-      weight: { title: 'مشكلة الوزن ⚖️' },
-    },
-    items: {
-      counting: { balloons: 'بالونات', bananas: 'موز', stars: 'نجوم', bees: 'نحل', apples: 'تفاح', flowers: 'زهور' },
-      snacks: { bananas: 'موز', cookies: 'بسكويت', berries: 'توت', peanuts: 'فول سوداني', candies: 'حلويات' },
-      measureLabels: { bigTree: 'شجرة كبيرة', tinySprout: 'نبتة صغيرة', elephant: 'فيل', mouse: 'فأر', house: 'منزل', tent: 'خيمة', train: 'قطار', bicycle: 'دراجة', watermelon: 'بطيخة', grapes: 'عنب', dinosaur: 'ديناصور', bunny: 'أرنب', ocean: 'المحيط', bathtub: 'حوض استحمام', sun: 'الشمس', moon: 'القمر' },
-      weightLabels: { magnet: 'مغناطيس', feather: 'ريشة', bigRock: 'صخرة كبيرة', leaf: 'ورقة', books: 'كتب', balloon: 'بالون', toyCar: 'سيارة لعبة', teddyBear: 'دبدوب', apple: 'تفاحة', strawberry: 'فراولة', football: 'كرة قدم', pingPongBall: 'كرة تنس طاولة', lion: 'أسد', hamster: 'هامستر' },
-    },
-    questions: {
-      counting: 'كم عدد {item} التي يراها ميلو؟ 🐵',
-      measuringBigger: 'أيّهما أكبر: {a} أم {b}؟',
-      measuringSmaller: 'أيّهما أصغر: {a} أم {b}؟',
-      sharingAdd: 'مع ميلو {a} من {item}، ثم يجد {b} أخرى. كم أصبح المجموع؟',
-      sharingSub: 'مع ميلو {total} من {item} وأكل {eaten}. كم بقي؟',
-      weightHeavier: 'أيّهما أثقل: {a} أم {b}؟',
-      weightLighter: 'أيّهما أخف: {a} أم {b}؟',
-    },
-    feedback: {
-      countingWrong: 'أوه لا! أخذ ميلو بالونات كثيرة وطار بعيدًا! 🎈🎈🎈',
-      countingCorrect: 'عدّ ممتاز! هبط ميلو بسلام! 🐵🎉',
-      measuringWrong: 'أوبس! أخطأ ميلو في القياس وسقط في الجيلي! 🫙💥',
-      measuringCorrect: 'قياس رائع! ميلو بقي جافًا! 📏🐵✨',
-      sharingWrong: 'يا إلهي! تقاسم خاطئ — الأصدقاء تدحرجوا مع كل الوجبات! 🍌🎲',
-      sharingCorrect: 'المشاركة رائعة! الجميع حصل على وجبته! 🐵🍌🎉',
-      weightWrong: 'بويـنغ! مقارنة وزن خاطئة — انطلق ميلو من الأرجوحة! 🪂',
-      weightCorrect: 'الأرجوحة متوازنة! تفكير ممتاز! ⚖️🐵🎊',
-    },
-    results: {
-      title: 'انتهت الجولة!',
-      scoreText: 'أجبت بشكل صحيح على {score} من {total}!',
-      goodEffort: 'مجهود رائع! استمر في التدريب مع ميلو!',
-      perfect: 'نتيجة مثالية! ميلو فخور بك جدًا! 🐵🎊',
-      great: 'عمل رائع! أنت تتحسن كثيرًا في الرياضيات! 🐵',
-    },
-    envBadge: '🚧 بيئة STAGING — ليست للإنتاج 🚧',
-  },
-};
-
-function getNestedTranslation(path, fallbackLanguage) {
-  const base = I18N[fallbackLanguage];
-  if (!base) return undefined;
-  return path.split('.').reduce((obj, key) => (obj && key in obj ? obj[key] : undefined), base);
-}
-
-function interpolate(text, params) {
-  const values = params || {};
-  return text.replace(/\{([^}]+)\}/g, (full, key) => (
-    key in values ? String(values[key]) : full
-  ));
-}
-
-function t(path, params) {
-  const inLanguage = getNestedTranslation(path, gameState.language);
-  const fallback = getNestedTranslation(path, 'en');
-  const value = inLanguage !== undefined ? inLanguage : fallback;
-  return typeof value === 'string' ? interpolate(value, params) : value;
-}
 
 // ─────────────────────────────────────────────
 //  Utility helpers
 // ─────────────────────────────────────────────
+const STORAGE_KEYS = {
+  version: 'miloProgressVersion',
+  unlocked: 'miloUnlockedLevelCount',
+  completed: 'miloCompletedLevels',
+};
+const STORAGE_VERSION = '1';
+const MAX_DECOY_ATTEMPTS = 20;
+const RESULTS_NAME_SEPARATOR = ' - ';
+
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -308,6 +46,81 @@ function repeat(char, n) {
   return Array(n).fill(char).join(' ');
 }
 
+function randomFrom(arr) {
+  return arr[randInt(0, arr.length - 1)];
+}
+
+function getLevel(levelIndex) {
+  return LEVELS[levelIndex];
+}
+
+function getCurrentLevel() {
+  return getLevel(gameState.activeLevelIndex);
+}
+
+function hasNextLevel(levelIndex) {
+  return levelIndex + 1 < LEVELS.length;
+}
+
+function isNextLevelUnlocked(levelIndex) {
+  return hasNextLevel(levelIndex) && levelIndex + 1 < gameState.unlockedLevelCount;
+}
+
+function syncProgressUI() {
+  saveProgress();
+  updateScoreDisplay();
+  updateMapProgressText();
+  renderLevelMap();
+}
+
+function loadProgress() {
+  try {
+    const version = window.localStorage.getItem(STORAGE_KEYS.version);
+    if (version !== STORAGE_VERSION) {
+      gameState.unlockedLevelCount = 1;
+      gameState.completedLevels = [];
+      saveProgress();
+      return;
+    }
+    const unlocked = Number(window.localStorage.getItem(STORAGE_KEYS.unlocked)) || 1;
+    const completed = JSON.parse(window.localStorage.getItem(STORAGE_KEYS.completed) || '[]');
+    gameState.unlockedLevelCount = Math.min(Math.max(unlocked, 1), LEVELS.length);
+    gameState.completedLevels = Array.isArray(completed)
+      ? completed.filter(levelIndex => Number.isInteger(levelIndex) && levelIndex >= 0 && levelIndex < LEVELS.length)
+      : [];
+  } catch (error) {
+    gameState.unlockedLevelCount = 1;
+    gameState.completedLevels = [];
+  }
+}
+
+function saveProgress() {
+  try {
+    window.localStorage.setItem(STORAGE_KEYS.version, STORAGE_VERSION);
+    window.localStorage.setItem(STORAGE_KEYS.unlocked, String(gameState.unlockedLevelCount));
+    window.localStorage.setItem(STORAGE_KEYS.completed, JSON.stringify(gameState.completedLevels));
+  } catch (error) {
+    // Ignore storage issues so the game still works in restricted browsers.
+  }
+}
+
+function completeLevel(levelIndex) {
+  if (!gameState.completedLevels.includes(levelIndex)) {
+    gameState.completedLevels.push(levelIndex);
+    gameState.completedLevels.sort((a, b) => a - b);
+  }
+
+  let unlockMessage = 'You cleared this level! Replay it anytime for more stars.';
+  const nextLevelIndex = levelIndex + 1;
+  if (hasNextLevel(levelIndex) && gameState.unlockedLevelCount <= nextLevelIndex) {
+    gameState.unlockedLevelCount = nextLevelIndex + 1;
+    playSound('unlock');
+    unlockMessage = 'New level unlocked: ' + LEVELS[nextLevelIndex].name + '!';
+  }
+
+  return unlockMessage;
+}
+
 // ─────────────────────────────────────────────
 //  Screen navigation
 // ─────────────────────────────────────────────
@@ -322,100 +135,118 @@ function showScreen(id) {
 
 /* ── 1. Counting Chaos ─────────────────────── */
 const COUNTING_ITEMS = [
-  { emoji: '🎈', nameKey: 'balloons' },
-  { emoji: '🍌', nameKey: 'bananas'  },
-  { emoji: '⭐', nameKey: 'stars'    },
-  { emoji: '🐝', nameKey: 'bees'     },
-  { emoji: '🍎', nameKey: 'apples'   },
-  { emoji: '🌸', nameKey: 'flowers'  },
+  { emoji: '��', name: 'balloons' },
+  { emoji: '🍌', name: 'bananas'  },
+  { emoji: '⭐', name: 'stars'    },
+  { emoji: '🐝', name: 'bees'     },
+  { emoji: '🍎', name: 'apples'   },
+  { emoji: '🌸', name: 'flowers'  },
 ];
+const MAX_COUNTING_LIMIT = 25;
 
-function makeCountingQuestion() {
+function makeCountingQuestion(level) {
   const item  = COUNTING_ITEMS[randInt(0, COUNTING_ITEMS.length - 1)];
-  const count = randInt(1, 20);
+  const minCount = level.minCount || 1;
+  const maxCount = level.maxCount || 20;
+  const distractorRange = level.distractorRange || 4;
+  const count = randInt(minCount, maxCount);
   const correct = count;
-  const itemName = t('items.counting.' + item.nameKey);
 
   const distractors = new Set();
+  const maxChoiceLimit = Math.min(maxCount + Math.max(distractorRange, 2), MAX_COUNTING_LIMIT);
   while (distractors.size < 3) {
-    const d = correct + randInt(-4, 4);
-    if (d !== correct && d >= 1 && d <= 25) distractors.add(d);
+    const d = correct + randInt(-distractorRange, distractorRange);
+    if (d !== correct && d >= 1 && d <= maxChoiceLimit) distractors.add(d);
   }
 
   return {
     type: 'counting',
     scene: repeat(item.emoji, count),
-    question: t('questions.counting', { item: itemName }),
+    question: 'How many ' + item.name + ' does Milo see? 🐵',
     correct,
     choices: shuffle([correct, ...distractors]),
     wrongAnim: 'float',
-    wrongMsg: t('feedback.countingWrong'),
-    correctMsg: t('feedback.countingCorrect'),
+    wrongMsg: 'Oh no! Milo grabbed too many balloons and FLEW AWAY! 🎈🎈🎈',
+    correctMsg: 'Great counting! Milo lands safely! 🐵🎉',
   };
 }
 
 /* ── 2. Measuring Mayhem ───────────────────── */
 const MEASURE_PAIRS = [
-  { a: { emoji: '🌳', labelKey: 'bigTree'    }, b: { emoji: '🌱', labelKey: 'tinySprout' } },
-  { a: { emoji: '🐘', labelKey: 'elephant'   }, b: { emoji: '🐭', labelKey: 'mouse'      } },
-  { a: { emoji: '🏠', labelKey: 'house'      }, b: { emoji: '⛺', labelKey: 'tent'       } },
-  { a: { emoji: '🚂', labelKey: 'train'      }, b: { emoji: '🚲', labelKey: 'bicycle'    } },
-  { a: { emoji: '🍉', labelKey: 'watermelon' }, b: { emoji: '🍇', labelKey: 'grapes'     } },
-  { a: { emoji: '🦕', labelKey: 'dinosaur'   }, b: { emoji: '🐇', labelKey: 'bunny'      } },
-  { a: { emoji: '🌊', labelKey: 'ocean'      }, b: { emoji: '🛁', labelKey: 'bathtub'    } },
-  { a: { emoji: '🌞', labelKey: 'sun'        }, b: { emoji: '🌙', labelKey: 'moon'       } },
+  { a: { emoji: '🌳', label: 'a big tree'   }, b: { emoji: '🌱', label: 'a tiny sprout'    } },
+  { a: { emoji: '🐘', label: 'an elephant'  }, b: { emoji: '🐭', label: 'a mouse'           } },
+  { a: { emoji: '🏠', label: 'a house'      }, b: { emoji: '⛺', label: 'a tent'             } },
+  { a: { emoji: '🚂', label: 'a train'      }, b: { emoji: '🚲', label: 'a bicycle'         } },
+  { a: { emoji: '🍉', label: 'a watermelon' }, b: { emoji: '🍇', label: 'grapes'             } },
+  { a: { emoji: '🦕', label: 'a dinosaur'   }, b: { emoji: '🐇', label: 'a bunny'           } },
+  { a: { emoji: '🌊', label: 'the ocean'    }, b: { emoji: '🛁', label: 'a bathtub'         } },
+  { a: { emoji: '🌞', label: 'the sun'      }, b: { emoji: '🌙', label: 'the moon'          } },
 ];
 
-function makeMeasuringQuestion() {
+function makeMeasuringQuestion(level) {
   const pair     = MEASURE_PAIRS[randInt(0, MEASURE_PAIRS.length - 1)];
   const askBig   = Math.random() < 0.5;
-  const aLabel = t('items.measureLabels.' + pair.a.labelKey);
-  const bLabel = t('items.measureLabels.' + pair.b.labelKey);
-  const bigLabel = pair.a.emoji + ' ' + aLabel;
-  const smlLabel = pair.b.emoji + ' ' + bLabel;
+  const bigLabel = pair.a.emoji + ' ' + pair.a.label;
+  const smlLabel = pair.b.emoji + ' ' + pair.b.label;
   const correct  = askBig ? bigLabel : smlLabel;
-  const choices  = shuffle([bigLabel, smlLabel]);
+  const choices  = [bigLabel, smlLabel];
+
+  if (level.includeThirdChoice) {
+    let decoy = correct;
+    let attempts = 0;
+    while (choices.includes(decoy) && attempts < MAX_DECOY_ATTEMPTS) {
+      const extraPair = randomFrom(MEASURE_PAIRS);
+      decoy = Math.random() < 0.5
+        ? extraPair.a.emoji + ' ' + extraPair.a.label
+        : extraPair.b.emoji + ' ' + extraPair.b.label;
+      attempts++;
+    }
+    if (!choices.includes(decoy)) choices.push(decoy);
+  }
 
   return {
     type: 'measuring',
     scene: pair.a.emoji + '   ' + pair.b.emoji,
     question: askBig
-      ? t('questions.measuringBigger', { a: aLabel, b: bLabel })
-      : t('questions.measuringSmaller', { a: aLabel, b: bLabel }),
+      ? 'Which is BIGGER: ' + pair.a.label + ' or ' + pair.b.label + '?'
+      : 'Which is SMALLER: ' + pair.a.label + ' or ' + pair.b.label + '?',
     correct,
-    choices,
+    choices: shuffle(choices),
     wrongAnim: 'fall',
-    wrongMsg: t('feedback.measuringWrong'),
-    correctMsg: t('feedback.measuringCorrect'),
+    wrongMsg: 'Oops! Milo measured wrong and fell into the jelly! 🫙💥',
+    correctMsg: 'Perfect measuring! Milo stays dry! 📏🐵✨',
   };
 }
 
 /* ── 3. Sharing Snacks ─────────────────────── */
 const SNACK_ITEMS = [
-  { emoji: '🍌', nameKey: 'bananas' },
-  { emoji: '🍪', nameKey: 'cookies' },
-  { emoji: '🍓', nameKey: 'berries' },
-  { emoji: '🥜', nameKey: 'peanuts' },
-  { emoji: '🍬', nameKey: 'candies' },
+  { emoji: '🍌', name: 'bananas' },
+  { emoji: '🍪', name: 'cookies' },
+  { emoji: '🍓', name: 'berries' },
+  { emoji: '🥜', name: 'peanuts' },
+  { emoji: '🍬', name: 'candies' },
 ];
 
-function makeSharingQuestion() {
+function makeSharingQuestion(level) {
   const item  = SNACK_ITEMS[randInt(0, SNACK_ITEMS.length - 1)];
   const mode  = randInt(0, 1); // 0=addition  1=subtraction
-  const itemName = t('items.snacks.' + item.nameKey);
 
   let question, correct, scene;
+  const additionRange = level.additionRange || [1, 10];
+  const subtractionTotalRange = level.subtractionTotalRange || [3, 15];
 
   if (mode === 0) {
-    const a = randInt(1, 10), b = randInt(1, 10);
+    const a = randInt(additionRange[0], additionRange[1]);
+    const b = randInt(additionRange[0], additionRange[1]);
     correct  = a + b;
     scene    = repeat(item.emoji, a) + '  ➕  ' + repeat(item.emoji, b);
-    question = t('questions.sharingAdd', { a, b, item: itemName });
+    question = 'Milo has ' + a + ' ' + item.name + ', then finds ' + b + ' more. How many altogether?';
   } else if (mode === 1) {
-    const total = randInt(3, 15), eaten = randInt(1, total - 1);
+    const total = randInt(subtractionTotalRange[0], subtractionTotalRange[1]);
+    const eaten = randInt(1, total - 1);
     correct  = total - eaten;
     scene    = repeat(item.emoji, total);
-    question = t('questions.sharingSub', { total, eaten, item: itemName });
+    question = 'Milo has ' + total + ' ' + item.name + ' and eats ' + eaten + '. How many are left?';
   }
 
   const distractors = new Set();
@@ -431,31 +262,42 @@ function makeSharingQuestion() {
     correct,
     choices: shuffle([correct, ...distractors]),
     wrongAnim: 'tumble',
-    wrongMsg: t('feedback.sharingWrong'),
-    correctMsg: t('feedback.sharingCorrect'),
+    wrongMsg: 'Uh oh! Wrong share! The friends rolled away with ALL the snacks! 🍌🎲',
+    correctMsg: 'Sharing is caring! Everyone gets their snacks! 🐵🍌🎉',
   };
 }
 
 /* ── 4. Weight Trouble ─────────────────────── */
 const WEIGHT_PAIRS = [
-  { a: { emoji: '🧲', labelKey: 'magnet'       }, b: { emoji: '🪶', labelKey: 'feather'      } },
-  { a: { emoji: '🪨', labelKey: 'bigRock'      }, b: { emoji: '🍃', labelKey: 'leaf'         } },
-  { a: { emoji: '📚', labelKey: 'books'        }, b: { emoji: '🎈', labelKey: 'balloon'      } },
-  { a: { emoji: '🚗', labelKey: 'toyCar'       }, b: { emoji: '🧸', labelKey: 'teddyBear'    } },
-  { a: { emoji: '🍎', labelKey: 'apple'        }, b: { emoji: '🍓', labelKey: 'strawberry'   } },
-  { a: { emoji: '⚽', labelKey: 'football'     }, b: { emoji: '🏓', labelKey: 'pingPongBall' } },
-  { a: { emoji: '🦁', labelKey: 'lion'         }, b: { emoji: '🐹', labelKey: 'hamster'      } },
+  { a: { emoji: '🧲', label: 'a magnet'        }, b: { emoji: '🪶', label: 'a feather'        } },
+  { a: { emoji: '🪨', label: 'a big rock'      }, b: { emoji: '🍃', label: 'a leaf'           } },
+  { a: { emoji: '📚', label: 'books'            }, b: { emoji: '🎈', label: 'a balloon'        } },
+  { a: { emoji: '🚗', label: 'a toy car'       }, b: { emoji: '🧸', label: 'a teddy bear'     } },
+  { a: { emoji: '🍎', label: 'an apple'         }, b: { emoji: '🍓', label: 'a strawberry'     } },
+  { a: { emoji: '⚽', label: 'a football'       }, b: { emoji: '🏓', label: 'a ping pong ball' } },
+  { a: { emoji: '🦁', label: 'a lion'           }, b: { emoji: '🐹', label: 'a hamster'        } },
 ];
 
-function makeWeightQuestion() {
+function makeWeightQuestion(level) {
   const pair      = WEIGHT_PAIRS[randInt(0, WEIGHT_PAIRS.length - 1)];
   const askHeavy  = Math.random() < 0.5;
-  const aLabel = t('items.weightLabels.' + pair.a.labelKey);
-  const bLabel = t('items.weightLabels.' + pair.b.labelKey);
-  const heavyLabel = pair.a.emoji + ' ' + aLabel;
-  const lightLabel = pair.b.emoji + ' ' + bLabel;
+  const heavyLabel = pair.a.emoji + ' ' + pair.a.label;
+  const lightLabel = pair.b.emoji + ' ' + pair.b.label;
   const correct    = askHeavy ? heavyLabel : lightLabel;
-  const choices    = shuffle([heavyLabel, lightLabel]);
+  const choices    = [heavyLabel, lightLabel];
+
+  if (level.includeThirdChoice) {
+    let decoy = correct;
+    let attempts = 0;
+    while (choices.includes(decoy) && attempts < MAX_DECOY_ATTEMPTS) {
+      const extraPair = randomFrom(WEIGHT_PAIRS);
+      decoy = Math.random() < 0.5
+        ? extraPair.a.emoji + ' ' + extraPair.a.label
+        : extraPair.b.emoji + ' ' + extraPair.b.label;
+      attempts++;
+    }
+    if (!choices.includes(decoy)) choices.push(decoy);
+  }
 
   return {
     type: 'weight',
@@ -463,13 +305,13 @@ function makeWeightQuestion() {
     seesawA: pair.a.emoji,
     seesawB: pair.b.emoji,
     question: askHeavy
-      ? t('questions.weightHeavier', { a: aLabel, b: bLabel })
-      : t('questions.weightLighter', { a: aLabel, b: bLabel }),
+      ? 'Which is HEAVIER: ' + pair.a.label + ' or ' + pair.b.label + '?'
+      : 'Which is LIGHTER: ' + pair.a.label + ' or ' + pair.b.label + '?',
     correct,
-    choices,
+    choices: shuffle(choices),
     wrongAnim: 'launch',
-    wrongMsg: t('feedback.weightWrong'),
-    correctMsg: t('feedback.weightCorrect'),
+    wrongMsg: 'BOING! Wrong weight — Milo got launched off the seesaw! 🪂',
+    correctMsg: 'The seesaw balances! Great thinking! ⚖️🐵🎊',
   };
 }
 
@@ -477,18 +319,101 @@ function makeWeightQuestion() {
 //  Game registry
 // ─────────────────────────────────────────────
 const MINI_GAMES = {
-  counting: { titleKey: 'games.counting.title',   makeQuestion: makeCountingQuestion  },
-  measuring:{ titleKey: 'games.measuring.title',  makeQuestion: makeMeasuringQuestion },
-  sharing:  { titleKey: 'games.sharing.title',    makeQuestion: makeSharingQuestion   },
-  weight:   { titleKey: 'games.weight.title',     makeQuestion: makeWeightQuestion    },
+  counting: { title: 'Counting Chaos 🎈',   makeQuestion: makeCountingQuestion  },
+  measuring:{ title: 'Measuring Mayhem 📏', makeQuestion: makeMeasuringQuestion },
+  sharing:  { title: 'Sharing Snacks 🍌',   makeQuestion: makeSharingQuestion   },
+  weight:   { title: 'Weight Trouble ⚖️',   makeQuestion: makeWeightQuestion    },
 };
+
+const LEVELS = [
+  {
+    name: 'Level 1 · Balloon Trail',
+    game: 'counting',
+    icon: '🎈',
+    badge: 'Count 1–10',
+    description: 'Warm up by counting Milo’s first balloon bundles.',
+    questionsPerRound: 5,
+    minCount: 1,
+    maxCount: 10,
+    distractorRange: 2,
+  },
+  {
+    name: 'Level 2 · Giant or Tiny',
+    game: 'measuring',
+    icon: '📏',
+    badge: 'Big / Small',
+    description: 'Pick the bigger or smaller thing on Milo’s trail.',
+    questionsPerRound: 5,
+  },
+  {
+    name: 'Level 3 · Snack Split',
+    game: 'sharing',
+    icon: '🍌',
+    badge: 'Easy Sums',
+    description: 'Share Milo’s snacks with tiny totals and easy math.',
+    questionsPerRound: 5,
+    additionRange: [1, 6],
+    subtractionTotalRange: [4, 10],
+    sharingFriendsRange: [2, 3],
+    sharingPerFriendRange: [1, 4],
+  },
+  {
+    name: 'Level 4 · Seesaw Start',
+    game: 'weight',
+    icon: '⚖️',
+    badge: 'Heavy / Light',
+    description: 'Balance the jungle seesaw with simple weight picks.',
+    questionsPerRound: 5,
+  },
+  {
+    name: 'Level 5 · Counting Canopy',
+    game: 'counting',
+    icon: '🌴',
+    badge: 'Count 6–18',
+    description: 'Count bigger bunches before Milo floats into the canopy.',
+    questionsPerRound: 6,
+    minCount: 6,
+    maxCount: 18,
+    distractorRange: 4,
+  },
+  {
+    name: 'Level 6 · Size Safari',
+    game: 'measuring',
+    icon: '🦒',
+    badge: 'Extra Choice',
+    description: 'A trickier size challenge with one extra silly answer.',
+    questionsPerRound: 6,
+    includeThirdChoice: true,
+  },
+  {
+    name: 'Level 7 · Banana Bonanza',
+    game: 'sharing',
+    icon: '🍌',
+    badge: 'Bigger Math',
+    description: 'Solve larger addition, subtraction, and sharing puzzles.',
+    questionsPerRound: 6,
+    additionRange: [3, 12],
+    subtractionTotalRange: [8, 18],
+    sharingFriendsRange: [2, 5],
+    sharingPerFriendRange: [2, 6],
+  },
+  {
+    name: 'Level 8 · Monkey Master',
+    game: 'weight',
+    icon: '🏆',
+    badge: 'Expert Picks',
+    description: 'Milo’s final weight challenge adds another answer to dodge.',
+    questionsPerRound: 7,
+    includeThirdChoice: true,
+  },
+];
 
 // ─────────────────────────────────────────────
 //  Build a round of questions
 // ─────────────────────────────────────────────
-function buildRound(gameKey) {
-  const mk = MINI_GAMES[gameKey].makeQuestion;
-  return Array.from({ length: gameState.questionsPerRound }, () => mk());
+function buildRound(level) {
+  const mk = MINI_GAMES[level.game].makeQuestion;
+  return Array.from({ length: gameState.questionsPerRound }, () => mk(level));
 }
 
 // ─────────────────────────────────────────────
@@ -496,53 +421,46 @@ function buildRound(gameKey) {
 // ─────────────────────────────────────────────
 function updateScoreDisplay() {
   document.getElementById('score-display').textContent =
-    t('labels.score', { score: gameState.score, total: gameState.totalAnswered });
+    '⭐ Levels Cleared: ' + gameState.completedLevels.length + ' / ' + LEVELS.length;
 }
 
-function getGameTitle(gameKey) {
-  return t(MINI_GAMES[gameKey].titleKey);
-}
+function updateMapProgressText() {
+  const progressText = document.getElementById('map-progress-text');
+  if (!progressText) return;
 
-function setText(id, value) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = value;
-}
-
-function applyLanguage() {
-  document.documentElement.lang = gameState.language;
-  document.documentElement.dir = RTL_LANGUAGES.has(gameState.language) ? 'rtl' : 'ltr';
-
-  setText('welcome-title', t('welcomeTitle'));
-  setText('welcome-slogan', t('welcomeSlogan'));
-  setText('language-label', t('languageLabel'));
-  setText('play-btn', t('buttons.play'));
-  setText('menu-title', t('menuTitle'));
-  setText('card-counting-title', t('cards.counting.title'));
-  setText('card-counting-desc', t('cards.counting.desc'));
-  setText('card-counting-badge', t('cards.counting.badge'));
-  setText('card-measuring-title', t('cards.measuring.title'));
-  setText('card-measuring-desc', t('cards.measuring.desc'));
-  setText('card-measuring-badge', t('cards.measuring.badge'));
-  setText('card-sharing-title', t('cards.sharing.title'));
-  setText('card-sharing-desc', t('cards.sharing.desc'));
-  setText('card-sharing-badge', t('cards.sharing.badge'));
-  setText('card-weight-title', t('cards.weight.title'));
-  setText('card-weight-desc', t('cards.weight.desc'));
-  setText('card-weight-badge', t('cards.weight.badge'));
-  setText('next-btn', t('buttons.nextQuestion'));
-  setText('back-to-menu-btn', t('buttons.backToMenu'));
-  setText('results-title', t('results.title'));
-  setText('play-again-btn', t('buttons.playAgain'));
-  setText('choose-game-btn', t('buttons.chooseGame'));
-  setText('env-badge-text', t('envBadge'));
-
-  const answersGrid = document.getElementById('answers-grid');
-  if (answersGrid) {
-    answersGrid.setAttribute('aria-label', t('aria.answers'));
+  if (gameState.completedLevels.length >= LEVELS.length) {
+    progressText.textContent = 'Amazing! You unlocked every stop on Milo’s jungle map!';
+    return;
   }
 
-  updateScoreDisplay();
+  const nextLevel = LEVELS[Math.max(gameState.unlockedLevelCount - 1, 0)];
+  progressText.textContent = 'Next jungle stop: ' + nextLevel.name + '. Tap any unlocked level to play!';
+}
+
+function renderLevelMap() {
+  const mapEl = document.getElementById('level-map');
+  if (!mapEl) return;
+
+  mapEl.innerHTML = '';
+
+  LEVELS.forEach((level, levelIndex) => {
+    const unlocked = levelIndex < gameState.unlockedLevelCount;
+    const completed = gameState.completedLevels.includes(levelIndex);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'level-node ' + (completed ? 'completed' : (unlocked ? 'unlocked' : 'locked'));
+    button.setAttribute('aria-label', level.name + (unlocked ? '' : ' locked'));
+    button.disabled = !unlocked;
+    button.innerHTML =
+      '<span class="level-step">' + (levelIndex + 1) + '</span>' +
+      '<span class="card-icon">' + level.icon + '</span>' +
+      '<div class="card-title">' + level.name + '</div>' +
+      '<div class="card-desc">' + level.description + '</div>' +
+      '<span class="card-badge">' + level.badge + '</span>' +
+      '<span class="card-status">' + (completed ? 'Cleared ✅' : (unlocked ? 'Ready to play' : 'Locked 🔒')) + '</span>';
+    if (unlocked) button.addEventListener('click', () => startLevel(levelIndex));
+    mapEl.appendChild(button);
+  });
 }
 
 // ─────────────────────────────────────────────
@@ -551,9 +469,9 @@ function applyLanguage() {
 function renderQuestion() {
   const q = gameState.currentQ;
 
-  document.getElementById('game-title-label').textContent = getGameTitle(gameState.activeGame);
+  document.getElementById('game-title-label').textContent = MINI_GAMES[gameState.activeGame].title;
   document.getElementById('question-counter').textContent =
-    t('labels.questionCounter', { current: gameState.questionIndex + 1, total: gameState.questionsPerRound });
+    'Q ' + (gameState.questionIndex + 1) + ' / ' + gameState.questionsPerRound;
 
   // Reset Milo animation
   const miloEl = document.getElementById('milo-char');
@@ -632,7 +550,7 @@ function handleAnswer(chosen) {
   miloEl.classList.add(isCorrect ? 'celebrate' : (q.wrongAnim || 'tumble'));
 
   if (isCorrect) gameState.score++;
-  updateScoreDisplay();
+  playSound(isCorrect ? 'correct' : 'wrong');
 
   // Feedback
   const fb = document.getElementById('feedback-banner');
@@ -647,7 +565,7 @@ function handleAnswer(chosen) {
   // Show next / finish button
   const nextBtn = document.getElementById('next-btn');
   const isLast  = gameState.questionIndex >= gameState.questionsPerRound - 1;
-  nextBtn.textContent = isLast ? t('buttons.seeResults') : t('buttons.nextQuestion');
+  nextBtn.textContent = isLast ? 'See Results 🏆' : 'Next Question ➡️';
   nextBtn.style.display = 'inline-block';
 }
 
@@ -668,99 +586,188 @@ function advanceQuestion() {
 //  Show results screen
 // ─────────────────────────────────────────────
 function showResults() {
+  const level = getCurrentLevel();
   const pct = gameState.score / gameState.questionsPerRound;
   let stars = '⭐';
-  let msg   = t('results.goodEffort');
+  let msg   = 'Good effort! Keep practicing with Milo!';
   if (pct === 1) {
     stars = '⭐⭐⭐';
-    msg   = t('results.perfect');
+    msg   = 'PERFECT SCORE! Milo is so proud of you! 🐵🎊';
   } else if (pct >= 0.6) {
     stars = '⭐⭐';
-    msg   = t('results.great');
+    msg   = 'Great job! You are getting really good at math! 🐵';
   }
 
   document.getElementById('results-score-text').textContent =
-    t('results.scoreText', { score: gameState.score, total: gameState.questionsPerRound });
+    'You got ' + gameState.score + ' out of ' + gameState.questionsPerRound + ' correct!';
   document.getElementById('results-stars').textContent = stars;
   document.getElementById('results-msg').textContent = msg;
-  document.getElementById('results-game-name').textContent = getGameTitle(gameState.activeGame);
+  document.getElementById('results-game-name').textContent = level.name + RESULTS_NAME_SEPARATOR + MINI_GAMES[level.game].title;
+  document.getElementById('results-unlock-text').textContent = completeLevel(gameState.activeLevelIndex);
+  syncProgressUI();
+
+  const nextLevelBtn = document.getElementById('next-level-btn');
+  if (isNextLevelUnlocked(gameState.activeLevelIndex)) {
+    nextLevelBtn.style.display = 'inline-block';
+  } else {
+    nextLevelBtn.style.display = 'none';
+  }
   showScreen('results-screen');
 }
 
 // ─────────────────────────────────────────────
 //  Start a mini-game
 // ─────────────────────────────────────────────
-function startGame(gameKey) {
-  gameState.activeGame    = gameKey;
+function startLevel(levelIndex) {
+  const level = getLevel(levelIndex);
+  gameState.activeLevelIndex = levelIndex;
+  gameState.activeGame    = level.game;
   gameState.score         = 0;
   gameState.totalAnswered = 0;
+  gameState.questionsPerRound = level.questionsPerRound || 5;
   gameState.questionIndex = 0;
-  gameState.questions     = buildRound(gameKey);
+  gameState.questions     = buildRound(level);
   gameState.currentQ      = gameState.questions[0];
-  updateScoreDisplay();
+  playSound('start');
   showScreen('game-screen');
   renderQuestion();
+}
+
+// ─────────────────────────────────────────────
+//  Browser sound effects
+// ─────────────────────────────────────────────
+let audioContext = null;
+
+function getAudioContext() {
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return null;
+  if (!audioContext) audioContext = new AudioCtx();
+  if (audioContext.state === 'suspended') {
+    audioContext.resume().catch(error => {
+      if (typeof console !== 'undefined' && console.warn) {
+        console.warn('Unable to resume Milo audio context.', error);
+      }
+    });
+  }
+  return audioContext;
+}
+
+/**
+ * Play a short sequence of synthesized tones.
+ * @param {Array<{freq:number, duration?:number, type?:OscillatorType, volume?:number, gap?:number}>} tones
+ *   Tone descriptors used to build a playful sound effect.
+ */
+function playToneSequence(tones) {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  let startTime = ctx.currentTime + 0.01;
+  tones.forEach(tone => {
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    const duration = tone.duration || 0.12;
+    const volume = tone.volume || 0.06;
+
+    oscillator.type = tone.type || 'sine';
+    oscillator.frequency.setValueAtTime(tone.freq, startTime);
+    gainNode.gain.setValueAtTime(0.0001, startTime);
+    gainNode.gain.exponentialRampToValueAtTime(volume, startTime + 0.01);
+    gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    oscillator.start(startTime);
+    oscillator.stop(startTime + duration + 0.02);
+
+    startTime += duration + (tone.gap || 0.04);
+  });
+}
+
+/**
+ * Play one of the built-in UI sound effects.
+ * Valid effects: click, start, correct, wrong, unlock, locked.
+ * @param {string} effect
+ */
+function playSound(effect) {
+  const sounds = {
+    click: [
+      { freq: 520, duration: 0.05, type: 'triangle', volume: 0.03 },
+      { freq: 660, duration: 0.05, type: 'triangle', volume: 0.03 },
+    ],
+    start: [
+      { freq: 330, duration: 0.06, type: 'square', volume: 0.04 },
+      { freq: 440, duration: 0.06, type: 'square', volume: 0.04 },
+      { freq: 554, duration: 0.08, type: 'triangle', volume: 0.05 },
+    ],
+    correct: [
+      { freq: 523, duration: 0.08, type: 'triangle' },
+      { freq: 659, duration: 0.08, type: 'triangle' },
+      { freq: 784, duration: 0.12, type: 'sine' },
+    ],
+    wrong: [
+      { freq: 280, duration: 0.09, type: 'sawtooth', volume: 0.05 },
+      { freq: 220, duration: 0.14, type: 'sawtooth', volume: 0.05 },
+    ],
+    unlock: [
+      { freq: 440, duration: 0.06, type: 'triangle' },
+      { freq: 660, duration: 0.06, type: 'triangle' },
+      { freq: 880, duration: 0.16, type: 'sine', volume: 0.08 },
+    ],
+    locked: [
+      { freq: 190, duration: 0.08, type: 'square', volume: 0.04 },
+      { freq: 150, duration: 0.08, type: 'square', volume: 0.04 },
+    ],
+  };
+
+  if (sounds[effect]) playToneSequence(sounds[effect]);
 }
 
 // ─────────────────────────────────────────────
 //  DOM ready
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  let storedLanguage = null;
-  try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      storedLanguage = window.localStorage.getItem('milo-language');
-    }
-  } catch (_) {
-    storedLanguage = null;
-  }
-  if (storedLanguage && SUPPORTED_LANGUAGES.includes(storedLanguage)) {
-    gameState.language = storedLanguage;
-  }
-
-  applyLanguage();
-
-  const languageSelect = document.getElementById('language-select');
-  if (languageSelect) {
-    languageSelect.value = gameState.language;
-    languageSelect.addEventListener('change', event => {
-      const nextLanguage = event.target.value;
-      if (!SUPPORTED_LANGUAGES.includes(nextLanguage)) return;
-      gameState.language = nextLanguage;
-      try {
-        if (typeof window !== 'undefined' && window.localStorage) {
-          window.localStorage.setItem('milo-language', gameState.language);
-        }
-      } catch (_) {}
-      applyLanguage();
-    });
-  }
+  loadProgress();
+  syncProgressUI();
 
   // Welcome → Menu
   document.getElementById('play-btn').addEventListener('click', () => {
+    playSound('click');
     showScreen('menu-screen');
   });
 
-  // Menu → mini-games
-  document.querySelectorAll('.game-card').forEach(card => {
-    card.addEventListener('click', () => startGame(card.dataset.game));
-  });
-
   // Next / Finish button
-  document.getElementById('next-btn').addEventListener('click', advanceQuestion);
+  document.getElementById('next-btn').addEventListener('click', () => {
+    playSound('click');
+    advanceQuestion();
+  });
 
   // Back to menu from game
   document.getElementById('back-to-menu-btn').addEventListener('click', () => {
+    playSound('click');
+    updateMapProgressText();
+    renderLevelMap();
     showScreen('menu-screen');
   });
 
   // Results → play same game again
   document.getElementById('play-again-btn').addEventListener('click', () => {
-    startGame(gameState.activeGame);
+    playSound('click');
+    startLevel(gameState.activeLevelIndex);
+  });
+
+  // Results → next level
+  document.getElementById('next-level-btn').addEventListener('click', () => {
+    playSound('click');
+    if (isNextLevelUnlocked(gameState.activeLevelIndex)) {
+      startLevel(gameState.activeLevelIndex + 1);
+    }
   });
 
   // Results → choose another game
   document.getElementById('choose-game-btn').addEventListener('click', () => {
+    playSound('click');
+    updateMapProgressText();
+    renderLevelMap();
     showScreen('menu-screen');
   });
 

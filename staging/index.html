@@ -14,18 +14,9 @@
   ══════════════════════════════════════ -->
   <section id="welcome-screen" class="screen">
     <div class="logo-badge" aria-label="Milo the monkey hanging from a number 5">🐵</div>
-    <h1 id="welcome-title" class="game-title">Milo the<br>Math Monkey</h1>
-    <p id="welcome-slogan" class="game-slogan">"Count it right… or watch Milo take a tumble!"</p>
+    <h1 class="game-title">Milo the<br>Math Monkey</h1>
+    <p class="game-slogan">"Count it right… or watch Milo take a tumble!"</p>
     <div class="number-decoration" aria-hidden="true">1 2 3 4 5</div>
-    <div class="language-picker">
-      <label for="language-select" id="language-label">Language</label>
-      <select id="language-select" aria-label="Select language">
-        <option value="en">English</option>
-        <option value="ru">Русский</option>
-        <option value="he">עברית</option>
-        <option value="ar">العربية</option>
-      </select>
-    </div>
     <button id="play-btn" class="btn btn-play">🎮 Play!</button>
   </section>
 
@@ -34,41 +25,13 @@
   ══════════════════════════════════════ -->
   <section id="menu-screen" class="screen">
     <div class="menu-header">
-      <h2 id="menu-title">🐵 Choose a Mini-Game!</h2>
-      <p class="score-display" id="score-display">⭐ Score: 0 / 0</p>
+      <h2>🗺️ Milo's Jungle Level Map</h2>
+      <p class="score-display" id="score-display">⭐ Levels Cleared: 0 / 0</p>
+      <p class="map-progress" id="map-progress-text">Complete each stop on the trail to unlock the next adventure!</p>
     </div>
 
-    <div class="games-grid">
-
-      <div class="game-card" data-game="counting" role="button" tabindex="0" aria-label="Counting Chaos game">
-        <div class="card-icon">🎈</div>
-        <div class="card-title" id="card-counting-title">Counting Chaos</div>
-        <div class="card-desc" id="card-counting-desc">Count the items before Milo grabs too many balloons and flies away!</div>
-        <span class="card-badge" id="card-counting-badge">Counting 1–20</span>
-      </div>
-
-      <div class="game-card" data-game="measuring" role="button" tabindex="0" aria-label="Measuring Mayhem game">
-        <div class="card-icon">📏</div>
-        <div class="card-title" id="card-measuring-title">Measuring Mayhem</div>
-        <div class="card-desc" id="card-measuring-desc">Get it wrong and Milo falls face-first into the jelly!</div>
-        <span class="card-badge" id="card-measuring-badge">Size &amp; Comparison</span>
-      </div>
-
-      <div class="game-card" data-game="sharing" role="button" tabindex="0" aria-label="Sharing Snacks game">
-        <div class="card-icon">🍌</div>
-        <div class="card-title" id="card-sharing-title">Sharing Snacks</div>
-        <div class="card-desc" id="card-sharing-desc">Wrong answer and the characters roll away with ALL the snacks!</div>
-        <span class="card-badge" id="card-sharing-badge">Addition &amp; Subtraction</span>
-      </div>
-
-      <div class="game-card" data-game="weight" role="button" tabindex="0" aria-label="Weight Trouble game">
-        <div class="card-icon">⚖️</div>
-        <div class="card-title" id="card-weight-title">Weight Trouble</div>
-        <div class="card-desc" id="card-weight-desc">Wrong weight comparison launches Milo off the seesaw — BOING!</div>
-        <span class="card-badge" id="card-weight-badge">Heavier &amp; Lighter</span>
-      </div>
-
-    </div>
+    <div id="level-map" class="level-map" aria-label="Interactive level map"></div>
+    <p class="map-tip">Tap an unlocked jungle stop to play that level.</p>
   </section>
 
   <!-- ══════════════════════════════════════
@@ -105,12 +68,14 @@
   ══════════════════════════════════════ -->
   <section id="results-screen" class="screen">
     <div class="results-milo" aria-label="Milo celebrating">🐵</div>
-    <h2 id="results-title" class="results-title">Round Complete!</h2>
+    <h2 class="results-title">Round Complete!</h2>
     <p class="results-score" id="results-score-text"></p>
     <p class="results-game-name" id="results-game-name" style="color:#888; font-size:.95rem; margin-bottom:10px;"></p>
+    <p class="results-unlock" id="results-unlock-text"></p>
     <div class="stars" id="results-stars" aria-label="Stars earned">⭐</div>
     <p class="results-msg" id="results-msg"></p>
     <div class="btn-row">
+      <button id="next-level-btn" class="btn btn-next" style="display:none;">🗺️ Next Level</button>
       <button id="play-again-btn" class="btn btn-primary">🔄 Play Again</button>
       <button id="choose-game-btn" class="btn btn-success">🎮 Choose Game</button>
     </div>
@@ -120,7 +85,7 @@
   <div id="env-badge" style="display:none; position:fixed; top:0; left:0; right:0;
        background:#FF4081; color:#fff; text-align:center; padding:6px 0; font-size:.9rem;
        font-family: 'Comic Sans MS', cursive; z-index:9999; letter-spacing:1px;">
-    <span id="env-badge-text">🚧 STAGING ENVIRONMENT — not for production use 🚧</span>
+    🚧 STAGING ENVIRONMENT — not for production use 🚧
   </div>
 
   <script src="config.js"></script>
