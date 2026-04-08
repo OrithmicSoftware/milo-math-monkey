@@ -226,7 +226,10 @@ function buildRound(gameKey) {
   while (questions.length < gameState.questionsPerRound && attempts < maxAttempts) {
     attempts++;
     const next = mk();
-    const questionKey = String(next.question ?? '');
+    const questionKey =
+      typeof next.question !== 'undefined'
+        ? String(next.question)
+        : JSON.stringify(next);
     if (seenQuestions.has(questionKey)) continue;
     seenQuestions.add(questionKey);
     questions.push(next);
