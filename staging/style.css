@@ -70,36 +70,57 @@ body {
   font-style: italic;
 }
 
-.animation-demo {
-  margin-top: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.animation-demo-buttons {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.demo-btn {
-  border: none;
-  border-radius: 20px;
-  padding: 8px 14px;
-  font-family: var(--font);
-  cursor: pointer;
-  background: var(--yellow);
-  color: var(--dark);
-  box-shadow: 0 4px 10px rgba(0,0,0,.15);
-}
-
 .number-decoration {
   font-size: 3rem;
   letter-spacing: 10px;
   margin-bottom: 30px;
   animation: colorCycle 3s linear infinite;
+}
+
+.language-switch-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  padding: 8px 10px;
+  margin-bottom: 24px;
+}
+
+.language-switch-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.language-switch {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.lang-switch-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-family: var(--font);
+  font-size: .95rem;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--dark);
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s, background .15s, color .15s;
+}
+
+.lang-switch-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0,0,0,.16);
+}
+
+.lang-switch-btn.active {
+  background: var(--purple);
+  color: var(--white);
 }
 
 @keyframes colorCycle {
@@ -194,64 +215,42 @@ body {
 }
 
 .milo-character {
-  position: relative;
+  font-size: 5rem;
   margin-bottom: 10px;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
+  display: inline-block;
   transition: transform .3s;
 }
-.milo-head {
-  font-size: 4.4rem;
-  line-height: 1;
+.milo-character.celebrate { animation: celebrate .6s ease-in-out; }
+.milo-character.tumble    { animation: tumble .8s ease-in-out; }
+.milo-character.float     { animation: floatAway 1.2s ease-in-out forwards; }
+.milo-character.fall      { animation: fallDown 1s ease-in-out; }
+.milo-character.launch    { animation: launchUp 1s ease-in-out; }
+
+@keyframes celebrate {
+  0%,100% { transform: scale(1)   rotate(0deg);  }
+  25%      { transform: scale(1.3) rotate(-15deg);}
+  75%      { transform: scale(1.3) rotate(15deg); }
 }
-
-.milo-body {
-  width: 44px;
-  height: 58px;
-  margin-top: -8px;
-  border-radius: 20px 20px 18px 18px;
-  background: linear-gradient(180deg, #8d6e63 0%, #6d4c41 100%);
-  position: relative;
-  box-shadow: inset 0 -6px 0 rgba(0,0,0,.12);
+@keyframes tumble {
+  0%   { transform: rotate(0deg)   translateY(0);   }
+  30%  { transform: rotate(180deg) translateY(20px);}
+  60%  { transform: rotate(360deg) translateY(50px);}
+  100% { transform: rotate(360deg) translateY(0);   }
 }
-
-.milo-body::before,
-.milo-body::after {
-  content: '';
-  position: absolute;
-  top: 16px;
-  width: 14px;
-  height: 6px;
-  background: #5d4037;
-  border-radius: 8px;
+@keyframes floatAway {
+  0%   { transform: translateY(0)    scale(1);   }
+  50%  { transform: translateY(-60px) scale(1.1);}
+  100% { transform: translateY(-30px) scale(1);  }
 }
-
-.milo-body::before { left: -10px; transform: rotate(20deg); }
-.milo-body::after  { right: -10px; transform: rotate(-20deg); }
-
-.milo-character.dancing { animation: dance 1s ease-in-out infinite; }
-.milo-character.jumping-joy,
-.milo-character.success { animation: jumpJoy .75s ease-in-out; }
-.milo-character.falling,
-.milo-character.failure { animation: fallDown 1s ease-in forwards; }
-
-@keyframes dance {
-  0%,100% { transform: translateY(0) rotate(0deg); }
-  25%     { transform: translateY(-6px) rotate(-8deg); }
-  75%     { transform: translateY(-6px) rotate(8deg); }
-}
-
-@keyframes jumpJoy {
-  0%,100% { transform: translateY(0) scale(1); }
-  35%     { transform: translateY(-26px) scale(1.08); }
-  65%     { transform: translateY(-10px) scale(1.02); }
-}
-
 @keyframes fallDown {
-  0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
-  60%  { transform: translateY(44px) rotate(78deg); opacity: 1; }
-  100% { transform: translateY(54px) rotate(86deg); opacity: .95; }
+  0%   { transform: translateY(0);   }
+  40%  { transform: translateY(-30px);}
+  100% { transform: translateY(60px) rotate(90deg);}
+}
+@keyframes launchUp {
+  0%   { transform: translateY(0)    rotate(0deg);  }
+  40%  { transform: translateY(-80px) rotate(30deg); }
+  100% { transform: translateY(0)    rotate(0deg);  }
 }
 
 .question-scene {
@@ -341,9 +340,8 @@ body {
 
 /* ── Results screen ── */
 #results-screen { background: linear-gradient(135deg, #fff9c4 0%, #ffe0b2 100%); text-align: center; }
-#animation-screen { background: linear-gradient(135deg, #d1c4e9 0%, #fff9c4 100%); text-align: center; }
 
-.results-milo { font-size: 8rem; animation: jumpJoy 1s ease-in-out 3; margin-bottom: 10px; }
+.results-milo { font-size: 8rem; animation: celebrate 1s ease-in-out 3; margin-bottom: 10px; }
 
 .results-title { font-size: clamp(1.8rem, 5vw, 3rem); color: var(--orange); margin-bottom: 10px; }
 .results-score { font-size: clamp(1.2rem, 3vw, 1.8rem); color: var(--purple); margin-bottom: 6px; }
