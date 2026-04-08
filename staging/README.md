@@ -15,6 +15,8 @@ Milo is a goofy, overconfident monkey who loves numbers — but always gets into
 | 🍌 **Sharing Snacks** | Addition, subtraction & division | Wrong share — characters roll off with ALL the snacks! |
 | ⚖️ **Weight Trouble** | Heavier & lighter | Wrong comparison — Milo gets launched off the seesaw! |
 
+The game now strings these mini-games into an **interactive jungle level map** with unlockable advanced stages and playful browser-generated sound effects.
+
 ## 🧠 Learning Focus
 
 - Counting (1–20)
@@ -36,17 +38,6 @@ open index.html
 start index.html
 ```
 
-## 🎨 Character Concept Prototype
-
-A separate browser prototype for Milo's visual direction is available at `character.html`.
-It includes:
-
-- a standalone SVG Milo inspired by the provided monkey reference art
-- lightweight idle / reach / celebration motion loops suitable for browser gameplay
-- a small funny-sound board built with the Web Audio API
-
-Open `character.html` from the project root to preview the character concept on its own.
-
 ---
 
 ## 🌐 Deployments
@@ -55,7 +46,6 @@ Open `character.html` from the project root to preview the character concept on 
 |---|---|---|
 | **Production** | `https://orithmicsoftware.github.io/milo-math-monkey/` | Push to `main` |
 | **Staging** | `https://orithmicsoftware.github.io/milo-math-monkey/staging/` | Push to any feature branch or PR |
-| **Character prototype (staging)** | `https://orithmicsoftware.github.io/milo-math-monkey/staging/character.html` | Included with staging deploys |
 
 Both environments are deployed automatically to GitHub Pages via GitHub Actions.  
 The **staging** environment shows a visible pink banner at the top of the page so it cannot be confused with production.
@@ -79,9 +69,6 @@ GitHub Pages is configured to serve the `gh-pages` branch.
 ├── style.css           # Colorful, kid-friendly styles & animations
 ├── game.js             # Game logic for all four mini-games
 ├── config.js           # Environment flag (production | staging)
-├── character.html      # Standalone Milo character concept prototype
-├── styles.css          # Styling for the character prototype
-├── script.js           # Sound + animation hooks for the character prototype
 └── .github/
     └── workflows/
         ├── deploy-production.yml   # Production deployment
