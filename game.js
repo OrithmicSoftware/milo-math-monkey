@@ -315,7 +315,7 @@ function handleAnswer(chosen) {
 
   // Milo animation
   const miloEl = document.getElementById('milo-char');
-  playMiloAnimation(miloEl, isCorrect ? 'success' : 'failure');
+  playMiloAnimation(miloEl, isCorrect ? 'success' : (q.wrongAnim || 'failure'));
 
   if (isCorrect) gameState.score++;
   updateScoreDisplay();
