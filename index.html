@@ -38,58 +38,68 @@
       <p class="score-display" id="score-display">⭐ Score: 0 / 0</p>
     </div>
 
-    <div class="games-grid">
+    <div class="games-grid level-map" aria-label="Mini-game level map">
+      <div class="map-path" aria-hidden="true"></div>
 
-      <div class="game-card" data-game="counting" role="button" tabindex="0" aria-label="Counting Chaos game">
+      <div class="game-card level-node level-1" data-game="counting" role="button" tabindex="0" aria-label="Level 1: Counting Chaos game">
+        <span class="level-number">1</span>
         <div class="card-icon">🎈</div>
         <div id="card-counting-title" class="card-title">Counting Chaos</div>
         <div id="card-counting-desc" class="card-desc">Count the items before Milo grabs too many balloons and flies away!</div>
         <span id="card-counting-badge" class="card-badge">Counting 1–20</span>
       </div>
 
-      <div class="game-card" data-game="measuring" role="button" tabindex="0" aria-label="Measuring Mayhem game">
+      <div class="game-card level-node level-2" data-game="measuring" role="button" tabindex="0" aria-label="Level 2: Measuring Mayhem game">
+        <span class="level-number">2</span>
         <div class="card-icon">📏</div>
         <div id="card-measuring-title" class="card-title">Measuring Mayhem</div>
         <div id="card-measuring-desc" class="card-desc">Get it wrong and Milo falls face-first into the jelly!</div>
         <span id="card-measuring-badge" class="card-badge">Size &amp; Comparison</span>
       </div>
 
-      <div class="game-card" data-game="sharing" role="button" tabindex="0" aria-label="Sharing Snacks game">
+      <div class="game-card level-node level-3" data-game="sharing" role="button" tabindex="0" aria-label="Level 3: Sharing Snacks game">
+        <span class="level-number">3</span>
         <div class="card-icon">🍌</div>
         <div id="card-sharing-title" class="card-title">Sharing Snacks</div>
         <div id="card-sharing-desc" class="card-desc">Wrong answer and the characters roll away with ALL the snacks!</div>
         <span id="card-sharing-badge" class="card-badge">Addition &amp; Subtraction</span>
       </div>
 
-      <div class="game-card" data-game="whoMore" role="button" tabindex="0" aria-label="Who Has More game">
+      <div class="game-card level-node level-4" data-game="whoMore" role="button" tabindex="0" aria-label="Level 4: Who Has More game">
+        <span class="level-number">4</span>
         <div class="card-icon">🙋</div>
         <div id="card-who-more-title" class="card-title">Who Has More?</div>
         <div id="card-who-more-desc" class="card-desc">Compare two groups and pick who has more items.</div>
         <span id="card-who-more-badge" class="card-badge">Count + Compare</span>
       </div>
 
-      <div class="game-card" data-game="whatMore" role="button" tabindex="0" aria-label="What Is More game">
+      <div class="game-card level-node level-5" data-game="whatMore" role="button" tabindex="0" aria-label="Level 5: What Is More game">
+        <span class="level-number">5</span>
         <div class="card-icon">👀</div>
         <div id="card-what-more-title" class="card-title">What Is More?</div>
         <div id="card-what-more-desc" class="card-desc">Spot which item appears more in the scene.</div>
         <span id="card-what-more-badge" class="card-badge">Comparison</span>
       </div>
 
-      <div class="game-card" data-game="compound" role="button" tabindex="0" aria-label="Compound Crunch game">
+      <div class="game-card level-node level-6" data-game="compound" role="button" tabindex="0" aria-label="Level 6: Compound Crunch game">
+        <span class="level-number">6</span>
         <div class="card-icon">➕➖</div>
         <div id="card-compound-title" class="card-title">Compound Crunch</div>
         <div id="card-compound-desc" class="card-desc">Solve a two-step problem like x + y - z.</div>
         <span id="card-compound-badge" class="card-badge">Compound Operations</span>
       </div>
 
-      <div class="game-card" data-game="weight" role="button" tabindex="0" aria-label="Weight Trouble game">
+      <div class="game-card level-node level-7" data-game="weight" role="button" tabindex="0" aria-label="Level 7: Weight Trouble game">
+        <span class="level-number">7</span>
         <div class="card-icon">⚖️</div>
         <div id="card-weight-title" class="card-title">Weight Trouble</div>
         <div id="card-weight-desc" class="card-desc">Wrong weight comparison launches Milo off the seesaw — BOING!</div>
         <span id="card-weight-badge" class="card-badge">Heavier &amp; Lighter</span>
       </div>
 
+      <div class="treasure-island" aria-hidden="true">🏆</div>
     </div>
+    <p class="map-help">Pick a level island to start playing!</p>
   </section>
 
   <!-- ══════════════════════════════════════
