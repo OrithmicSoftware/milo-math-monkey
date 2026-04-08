@@ -41,6 +41,9 @@ const I18N = {
       counting: { title: 'Counting Chaos', desc: 'Count the items before Milo grabs too many balloons and flies away!', badge: 'Counting 1–20' },
       measuring: { title: 'Measuring Mayhem', desc: 'Get it wrong and Milo falls face-first into the jelly!', badge: 'Size & Comparison' },
       sharing: { title: 'Sharing Snacks', desc: 'Wrong answer and the characters roll away with ALL the snacks!', badge: 'Addition & Subtraction' },
+      whoMore: { title: 'Who Has More?', desc: 'Compare two groups and pick who has more items.', badge: 'Count + Compare' },
+      whatMore: { title: 'What Is More?', desc: 'Spot which item appears more in the scene.', badge: 'Comparison' },
+      compound: { title: 'Compound Crunch', desc: 'Solve a two-step problem like x + y - z.', badge: 'Compound Operations' },
       weight: { title: 'Weight Trouble', desc: 'Wrong weight comparison launches Milo off the seesaw — BOING!', badge: 'Heavier & Lighter' },
     },
     games: {
@@ -102,6 +105,9 @@ const I18N = {
       counting: { title: 'Счётный хаос', desc: 'Сосчитай предметы, пока Мило не улетел с шариками!', badge: 'Счёт 1–20' },
       measuring: { title: 'Измерительный переполох', desc: 'Ошибись — и Мило плюхнется в желе!', badge: 'Размер и сравнение' },
       sharing: { title: 'Делим угощения', desc: 'Неверный ответ — и друзья укатят со ВСЕМИ вкусняшками!', badge: 'Сложение и вычитание' },
+      whoMore: { title: 'У кого больше?', desc: 'Сравни две группы и выбери, где предметов больше.', badge: 'Счёт + сравнение' },
+      whatMore: { title: 'Чего больше?', desc: 'Найди, какого предмета на картинке больше.', badge: 'Сравнение' },
+      compound: { title: 'Сложный счёт', desc: 'Реши задачу в два шага, например x + y - z.', badge: 'Составные действия' },
       weight: { title: 'Весовые неприятности', desc: 'Ошибка в сравнении веса — и Мило улетает с качелей!', badge: 'Тяжелее и легче' },
     },
     games: {
@@ -163,6 +169,9 @@ const I18N = {
       counting: { title: 'בלגן ספירה', desc: 'ספרו את הפריטים לפני שמילו יעוף עם יותר מדי בלונים!', badge: 'ספירה 1–20' },
       measuring: { title: 'מהומת מדידה', desc: 'טעות — ומילו נופל ישר לג׳לי!', badge: 'גודל והשוואה' },
       sharing: { title: 'מחלקים חטיפים', desc: 'תשובה שגויה — והחברים מתגלגלים עם כל החטיפים!', badge: 'חיבור וחיסור' },
+      whoMore: { title: 'למי יש יותר?', desc: 'השוו בין שתי קבוצות ובחרו למי יש יותר פריטים.', badge: 'ספירה והשוואה' },
+      whatMore: { title: 'מה יותר?', desc: 'מצאו איזה פריט מופיע יותר בתמונה.', badge: 'השוואה' },
+      compound: { title: 'קראנץ׳ מורכב', desc: 'פתרו תרגיל בשני שלבים, כמו x + y - z.', badge: 'פעולות מורכבות' },
       weight: { title: 'צרות משקל', desc: 'השוואת משקל שגויה מעיפה את מילו מהנדנדה!', badge: 'כבד וקל' },
     },
     games: {
@@ -224,6 +233,9 @@ const I18N = {
       counting: { title: 'فوضى العد', desc: 'عدّ العناصر قبل أن يأخذ ميلو بالونات كثيرة ويطير!', badge: 'العد من 1 إلى 20' },
       measuring: { title: 'فوضى القياس', desc: 'إجابة خاطئة وميلو يسقط في الجيلي!', badge: 'الحجم والمقارنة' },
       sharing: { title: 'تقاسم الوجبات', desc: 'إجابة خاطئة والأصدقاء يهربون بكل الوجبات!', badge: 'الجمع والطرح' },
+      whoMore: { title: 'مَنْ عِنْدَهُ أَكْثَر؟', desc: 'قارِنْ بين مجموعتين واختر مَن لديه عناصر أكثر.', badge: 'العدّ + المقارنة' },
+      whatMore: { title: 'ما الأَكْثَر؟', desc: 'اكتشف أي عنصر يظهر أكثر في المشهد.', badge: 'المقارنة' },
+      compound: { title: 'العمليات المركبة', desc: 'حلّ مسألة من خطوتين مثل x + y - z.', badge: 'عمليات مركبة' },
       weight: { title: 'مشكلة الوزن', desc: 'مقارنة وزن خاطئة تطلق ميلو من الأرجوحة!', badge: 'أثقل وأخف' },
     },
     games: {
@@ -743,6 +755,15 @@ function applyLanguage() {
   setText('card-sharing-title', t('cards.sharing.title'));
   setText('card-sharing-desc', t('cards.sharing.desc'));
   setText('card-sharing-badge', t('cards.sharing.badge'));
+  setText('card-who-more-title', t('cards.whoMore.title'));
+  setText('card-who-more-desc', t('cards.whoMore.desc'));
+  setText('card-who-more-badge', t('cards.whoMore.badge'));
+  setText('card-what-more-title', t('cards.whatMore.title'));
+  setText('card-what-more-desc', t('cards.whatMore.desc'));
+  setText('card-what-more-badge', t('cards.whatMore.badge'));
+  setText('card-compound-title', t('cards.compound.title'));
+  setText('card-compound-desc', t('cards.compound.desc'));
+  setText('card-compound-badge', t('cards.compound.badge'));
   setText('card-weight-title', t('cards.weight.title'));
   setText('card-weight-desc', t('cards.weight.desc'));
   setText('card-weight-badge', t('cards.weight.badge'));
