@@ -67,6 +67,7 @@ const I18N = {
       measuringSmaller: 'Which is SMALLER: {a} or {b}?',
       sharingAdd: 'Milo has {a} {item}, then finds {b} more. How many altogether?',
       sharingSub: 'Milo has {total} {item} and eats {eaten}. How many are left?',
+      whoHasMore: 'Who has more {item}?',
       weightHeavier: 'Which is HEAVIER: {a} or {b}?',
       weightLighter: 'Which is LIGHTER: {a} or {b}?',
     },
@@ -134,6 +135,7 @@ const I18N = {
       measuringSmaller: 'Что МЕНЬШЕ: {a} или {b}?',
       sharingAdd: 'У Мило {a} {item}, потом он находит ещё {b}. Сколько стало всего?',
       sharingSub: 'У Мило {total} {item}, и он съедает {eaten}. Сколько осталось?',
+      whoHasMore: 'У кого больше {item}?',
       weightHeavier: 'Что ТЯЖЕЛЕЕ: {a} или {b}?',
       weightLighter: 'Что ЛЕГЧЕ: {a} или {b}?',
     },
@@ -201,6 +203,7 @@ const I18N = {
       measuringSmaller: 'מה יותר קטן: {a} או {b}?',
       sharingAdd: 'למילו יש {a} {item}, ואז הוא מוצא עוד {b}. כמה יש בסך הכול?',
       sharingSub: 'למילו יש {total} {item} והוא אוכל {eaten}. כמה נשאר?',
+      whoHasMore: 'למי יש יותר {item}?',
       weightHeavier: 'מה יותר כבד: {a} או {b}?',
       weightLighter: 'מה יותר קל: {a} או {b}?',
     },
@@ -268,6 +271,7 @@ const I18N = {
       measuringSmaller: 'أيّهما أصغر: {a} أم {b}؟',
       sharingAdd: 'مع ميلو {a} من {item}، ثم يجد {b} أخرى. كم أصبح المجموع؟',
       sharingSub: 'مع ميلو {total} من {item} وأكل {eaten}. كم بقي؟',
+      whoHasMore: 'مَنْ عِنْدَهُ {item} أكثر؟',
       weightHeavier: 'أيّهما أثقل: {a} أم {b}؟',
       weightLighter: 'أيّهما أخف: {a} أم {b}؟',
     },
@@ -571,6 +575,7 @@ const WHO_HAS_MORE_FRIENDS = [
 
 function makeWhoHasMoreQuestion() {
   const item = SNACK_ITEMS[randInt(0, SNACK_ITEMS.length - 1)];
+  const itemName = t('items.snacks.' + item.nameKey);
   const friend = WHO_HAS_MORE_FRIENDS[randInt(0, WHO_HAS_MORE_FRIENDS.length - 1)];
 
   const miloCount = randInt(2, 12);
@@ -583,7 +588,7 @@ function makeWhoHasMoreQuestion() {
     type: 'who-has-more',
     scene: '🐵 ' + repeat(item.emoji, miloCount) + '\n' +
            friend.emoji + ' ' + repeat(item.emoji, friendCount),
-    question: 'Who has more ' + item.name + '?',
+    question: t('questions.whoHasMore', { item: itemName }),
     correct,
     choices: shuffle(['Milo', friend.name]),
     wrongAnim: 'fall',
