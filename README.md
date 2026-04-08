@@ -13,14 +13,26 @@ Milo is a goofy, overconfident monkey who loves numbers — but always gets into
 | 🎈 **Counting Chaos** | Counting 1–20 | Too many balloons — Milo flies away! |
 | 📏 **Measuring Mayhem** | Size & comparison | Wrong answer — Milo falls into jelly! |
 | 🍌 **Sharing Snacks** | Addition & subtraction | Wrong share — characters roll off with ALL the snacks! |
+| 🙋 **Who Has More?** | Count + comparison | Wrong guess — Milo slips on snack crumbs! |
+| 👀 **What Is More?** | Comparison | Wrong pick — Milo mixes up the bigger group! |
+| ➕➖ **Compound Crunch** | Compound operations | Wrong step — Milo loses track of two-step math! |
 | ⚖️ **Weight Trouble** | Heavier & lighter | Wrong comparison — Milo gets launched off the seesaw! |
 
 ## 🧠 Learning Focus
 
 - Counting (1–20)
+- Count and compare (who has more)
+- Comparison (what is more)
 - Basic addition & subtraction
+- Compound operations (x + y - z)
 - Size and comparison
 - Early logic and estimation
+
+## 💡 More Mini-Game Ideas
+
+- Number order race: put 3 numbers in smallest-to-biggest order
+- Missing number hop: fill in the blank in a number pattern (e.g., 2, 4, _, 8)
+- Quick estimate: pick which group has about 10 items
 
 ---
 
