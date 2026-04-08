@@ -10,10 +10,8 @@
   --yellow:  #FFD93D;
   --orange:  #FF6B35;
   --green:   #4CAF50;
-  --green-dark:#2E7D32;
   --blue:    #4FC3F7;
   --purple:  #9C27B0;
-  --purple-dark:#5f4b8b;
   --pink:    #FF4081;
   --red:     #F44336;
   --white:   #FFFFFF;
@@ -115,67 +113,34 @@ body {
 .menu-header { text-align: center; margin-bottom: 30px; }
 .menu-header h2 { font-size: clamp(1.6rem, 4vw, 2.4rem); color: var(--orange); }
 .score-display  { font-size: 1.2rem; color: var(--purple); margin-top: 6px; }
-.map-progress   { font-size: 1rem; color: var(--purple-dark); margin-top: 8px; max-width: 680px; margin-left: auto; margin-right: auto; }
 
-.level-map {
+.games-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
   width: 100%;
-  max-width: 980px;
+  max-width: 900px;
 }
 
-.level-node {
+.game-card {
   background: var(--white);
   border-radius: var(--radius);
-  padding: 20px 18px;
-  text-align: left;
+  padding: 24px 20px;
+  text-align: center;
   cursor: pointer;
   box-shadow: var(--shadow);
   border: 4px solid transparent;
-  transition: transform .2s, border-color .2s, box-shadow .2s, opacity .2s;
-  position: relative;
+  transition: transform .2s, border-color .2s, box-shadow .2s;
 }
-.level-node:hover:not(:disabled) {
+.game-card:hover {
   transform: translateY(-6px) rotate(1deg);
   border-color: var(--yellow);
   box-shadow: 0 14px 32px rgba(0,0,0,.22);
 }
-.level-node:disabled { cursor: not-allowed; opacity: .75; }
-.level-node.completed { border-color: var(--green); background: linear-gradient(180deg, #f6fff4 0%, #ffffff 100%); }
-.level-node.unlocked:not(.completed) { border-color: var(--blue); }
-.level-node.locked { border-color: #d7d7d7; background: #f5f5f5; }
-
-.level-step {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: var(--yellow);
-  color: var(--dark);
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-.level-node.locked .level-step { background: #d7d7d7; }
-.level-node .card-icon  { font-size: 2.8rem; margin-bottom: 8px; display: block; }
-.level-node .card-title { font-size: 1.08rem; color: var(--orange); font-weight: bold; margin-bottom: 6px; }
-.level-node .card-desc  { font-size: .9rem; color: #666; min-height: 54px; }
-.level-node .card-badge,
-.level-node .card-status {
-  display: inline-block;
-  margin-top: 8px;
-  border-radius: 12px;
-  padding: 3px 12px;
-  font-size: .8rem;
-  color: var(--dark);
-}
-.level-node .card-badge { background: var(--yellow); margin-right: 6px; }
-.level-node .card-status { background: #e8f5e9; }
-.level-node.unlocked .card-status { background: #d0f0d6; color: var(--green-dark); }
-.level-node.locked .card-status { background: #ececec; }
-.map-tip { margin-top: 34px; color: #6a5d7b; font-size: .95rem; text-align: center; }
+.game-card .card-icon  { font-size: 3.5rem; margin-bottom: 10px; }
+.game-card .card-title { font-size: 1.2rem; color: var(--orange); font-weight: bold; margin-bottom: 6px; }
+.game-card .card-desc  { font-size: .9rem; color: #666; }
+.game-card .card-badge { display: inline-block; margin-top: 8px; background: var(--yellow); border-radius: 12px; padding: 3px 12px; font-size: .8rem; color: var(--dark); }
 
 /* ── Game screen ── */
 #game-screen { background: linear-gradient(135deg, #f3e5f5 0%, #e8f5e9 100%); }
@@ -334,7 +299,6 @@ body {
 
 .results-title { font-size: clamp(1.8rem, 5vw, 3rem); color: var(--orange); margin-bottom: 10px; }
 .results-score { font-size: clamp(1.2rem, 3vw, 1.8rem); color: var(--purple); margin-bottom: 6px; }
-.results-unlock { font-size: 1rem; color: var(--green-dark); margin-bottom: 10px; min-height: 24px; }
 .results-msg   { font-size: 1.1rem; color: #555; margin-bottom: 30px; max-width: 500px; }
 
 .stars { font-size: 3rem; letter-spacing: 6px; margin-bottom: 20px; }
@@ -357,6 +321,6 @@ body {
 /* ── Responsive ── */
 @media (max-width: 480px) {
   .answers-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .level-map    { grid-template-columns: 1fr 1fr; }
+  .games-grid   { grid-template-columns: 1fr 1fr; }
   .answer-btn   { padding: 14px 8px; }
 }
