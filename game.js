@@ -14,6 +14,8 @@ const gameState = {
   answered: false,
 };
 
+const UNIQUE_QUESTION_ATTEMPT_MULTIPLIER = 20;
+
 // ─────────────────────────────────────────────
 //  Utility helpers
 // ─────────────────────────────────────────────
@@ -217,14 +219,15 @@ function buildRound(gameKey) {
   const mk = MINI_GAMES[gameKey].makeQuestion;
   const questions = [];
   const seenQuestions = new Set();
-  const uniqueQuestionAttemptMultiplier = 20;
-  const maxAttempts = gameState.questionsPerRound * uniqueQuestionAttemptMultiplier;
+  const maxAttempts = gameState.questionsPerRound * UNIQUE_QUESTION_ATTEMPT_MULTIPLIER;
   let attempts = 0;
 
   while (questions.length < gameState.questionsPerRound && attempts < maxAttempts) {
     attempts++;
     const next = mk();
-    const questionKey = String(next.question);
+    const questionKey = typeof next.question === 'string'
+      ? next.question
+      : JSON.stringify(next.question);
     if (seenQuestions.has(questionKey)) continue;
     seenQuestions.add(questionKey);
     questions.push(next);
