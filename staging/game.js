@@ -14,9 +14,6 @@ const gameState = {
   answered: false,
 };
 
-// Balance trying for unique prompts with avoiding long generation loops.
-const UNIQUE_QUESTION_ATTEMPT_MULTIPLIER = 20;
-
 // ─────────────────────────────────────────────
 //  Utility helpers
 // ─────────────────────────────────────────────
@@ -35,6 +32,14 @@ function shuffle(arr) {
 
 function repeat(char, n) {
   return Array(n).fill(char).join(' ');
+}
+
+function playMiloAnimation(el, animationName) {
+  if (!el) return;
+  el.className = 'milo-character';
+  // Reflow allows restarting CSS animations when switching states.
+  void el.offsetWidth;
+  el.classList.add(animationName);
 }
 
 // ─────────────────────────────────────────────
@@ -218,29 +223,7 @@ const MINI_GAMES = {
 // ─────────────────────────────────────────────
 function buildRound(gameKey) {
   const mk = MINI_GAMES[gameKey].makeQuestion;
-  const questions = [];
-  const seenQuestions = new Set();
-  const maxAttempts = gameState.questionsPerRound * UNIQUE_QUESTION_ATTEMPT_MULTIPLIER;
-  let attempts = 0;
-
-  while (questions.length < gameState.questionsPerRound && attempts < maxAttempts) {
-    attempts++;
-    const next = mk();
-    // Questions are prompt-first and use a string `question` field in this codebase.
-    const questionKey =
-      next.question !== undefined
-        ? String(next.question)
-        : JSON.stringify(next);
-    if (seenQuestions.has(questionKey)) continue;
-    seenQuestions.add(questionKey);
-    questions.push(next);
-  }
-
-  while (questions.length < gameState.questionsPerRound) {
-    questions.push(mk());
-  }
-
-  return questions;
+  return Array.from({ length: gameState.questionsPerRound }, () => mk());
 }
 
 // ─────────────────────────────────────────────
@@ -263,8 +246,7 @@ function renderQuestion() {
 
   // Reset Milo animation
   const miloEl = document.getElementById('milo-char');
-  miloEl.className = 'milo-character';
-  void miloEl.offsetWidth; // reflow
+  playMiloAnimation(miloEl, 'dancing');
 
   // Scene
   const sceneEl = document.getElementById('question-scene');
@@ -333,9 +315,7 @@ function handleAnswer(chosen) {
 
   // Milo animation
   const miloEl = document.getElementById('milo-char');
-  miloEl.className = 'milo-character';
-  void miloEl.offsetWidth;
-  miloEl.classList.add(isCorrect ? 'celebrate' : (q.wrongAnim || 'tumble'));
+  playMiloAnimation(miloEl, isCorrect ? 'jumping-joy' : 'falling');
 
   if (isCorrect) gameState.score++;
   updateScoreDisplay();
@@ -418,6 +398,12 @@ document.addEventListener('DOMContentLoaded', () => {
     showScreen('menu-screen');
   });
 
+  // Menu → animation studio
+  document.getElementById('open-animation-demo-btn').addEventListener('click', () => {
+    showScreen('animation-screen');
+    playMiloAnimation(document.getElementById('milo-demo-char'), 'dancing');
+  });
+
   // Menu → mini-games
   document.querySelectorAll('.game-card').forEach(card => {
     card.addEventListener('click', () => startGame(card.dataset.game));
@@ -441,8 +427,26 @@ document.addEventListener('DOMContentLoaded', () => {
     showScreen('menu-screen');
   });
 
+  // Animation studio → menu
+  document.getElementById('back-from-animation-btn').addEventListener('click', () => {
+    showScreen('menu-screen');
+  });
+
   // Start on welcome screen
   showScreen('welcome-screen');
+
+  // Animation studio demo controls
+  const demoEl = document.getElementById('milo-demo-char');
+  const demoButtons = [
+    { id: 'demo-dance-btn', animation: 'dancing' },
+    { id: 'demo-fall-btn', animation: 'falling' },
+    { id: 'demo-joy-btn', animation: 'jumping-joy' },
+  ];
+  demoButtons.forEach(({ id, animation }) => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener('click', () => playMiloAnimation(demoEl, animation));
+  });
 });
 
 // ─────────────────────────────────────────────

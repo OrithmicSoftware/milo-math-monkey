@@ -60,10 +60,11 @@
       </div>
 
     </div>
+    <button id="open-animation-demo-btn" class="btn btn-primary" style="margin-top:18px;">🐵 Animation Studio</button>
   </section>
 
   <!-- ══════════════════════════════════════
-       GAME SCREEN
+        GAME SCREEN
   ══════════════════════════════════════ -->
   <section id="game-screen" class="screen">
 
@@ -74,7 +75,17 @@
 
     <!-- Milo + question scene -->
     <div class="milo-stage">
-      <span id="milo-char" class="milo-character" aria-label="Milo the monkey">🐵</span>
+      <div id="milo-char" class="milo-character" aria-label="Milo the monkey">
+        <div class="milo-head">🐵</div>
+        <div class="milo-torso">
+          <div class="milo-tail"></div>
+          <div class="milo-arm left"></div>
+          <div class="milo-arm right"></div>
+          <div class="milo-body"></div>
+          <div class="milo-leg left"></div>
+          <div class="milo-leg right"></div>
+        </div>
+      </div>
       <div class="question-scene" id="question-scene"></div>
       <p class="question-text" id="question-text"></p>
     </div>
@@ -89,6 +100,33 @@
     <button id="next-btn" class="btn btn-next" style="display:none; margin-top:14px;">Next Question ➡️</button>
     <button id="back-to-menu-btn" class="btn btn-back">⬅ Back to Menu</button>
 
+  </section>
+
+  <!-- ══════════════════════════════════════
+       ANIMATION STUDIO SCREEN
+  ══════════════════════════════════════ -->
+  <section id="animation-screen" class="screen">
+    <h2 class="results-title">🐵 Milo Animation Studio</h2>
+    <p class="results-msg" style="margin-bottom:12px;">Preview Milo's dance, fall, and jumping-for-joy animations.</p>
+    <div class="milo-stage">
+      <div id="milo-demo-char" class="milo-character dancing" aria-label="Milo animation demo character">
+        <div class="milo-head">🐵</div>
+        <div class="milo-torso">
+          <div class="milo-tail"></div>
+          <div class="milo-arm left"></div>
+          <div class="milo-arm right"></div>
+          <div class="milo-body"></div>
+          <div class="milo-leg left"></div>
+          <div class="milo-leg right"></div>
+        </div>
+      </div>
+      <div class="animation-demo-buttons" style="justify-content:center;">
+        <button id="demo-dance-btn" class="demo-btn" type="button">Dance</button>
+        <button id="demo-fall-btn" class="demo-btn" type="button">Fall</button>
+        <button id="demo-joy-btn" class="demo-btn" type="button">Jump in Joy</button>
+      </div>
+    </div>
+    <button id="back-from-animation-btn" class="btn btn-back">⬅ Back to Menu</button>
   </section>
 
   <!-- ══════════════════════════════════════
@@ -110,7 +148,7 @@
   <!-- Environment badge – shown only in staging (set by config.js + game.js) -->
   <div id="env-badge" style="display:none; position:fixed; top:0; left:0; right:0;
        background:#FF4081; color:#fff; text-align:center; padding:6px 0; font-size:.9rem;
-       font-family: 'Comic Sans MS', cursive; z-index:9999; letter-spacing:1px;">
+       font-family: 'Comic Sans MS', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', cursive; z-index:9999; letter-spacing:1px;">
     🚧 STAGING ENVIRONMENT — not for production use 🚧
   </div>
 
