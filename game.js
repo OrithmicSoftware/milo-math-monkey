@@ -435,7 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Start on welcome screen
   showScreen('welcome-screen');
 
-  // Welcome screen animation demo
+  // Animation studio demo controls
   const demoEl = document.getElementById('milo-demo-char');
   const demoButtons = [
     { id: 'demo-dance-btn', animation: 'dancing' },
