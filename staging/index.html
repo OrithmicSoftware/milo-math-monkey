@@ -48,29 +48,8 @@
       <div class="game-card" data-game="sharing" role="button" tabindex="0" aria-label="Sharing Snacks game">
         <div class="card-icon">🍌</div>
         <div class="card-title">Sharing Snacks</div>
-        <div class="card-desc">Wrong answer and the characters roll away with ALL the snacks!</div>
-        <span class="card-badge">Addition &amp; Subtraction</span>
-      </div>
-
-      <div class="game-card" data-game="whoMore" role="button" tabindex="0" aria-label="Who Has More game">
-        <div class="card-icon">🙋</div>
-        <div class="card-title">Who Has More?</div>
-        <div class="card-desc">Compare two groups and pick who has more items.</div>
-        <span class="card-badge">Count + Compare</span>
-      </div>
-
-      <div class="game-card" data-game="whatMore" role="button" tabindex="0" aria-label="What Is More game">
-        <div class="card-icon">👀</div>
-        <div class="card-title">What Is More?</div>
-        <div class="card-desc">Spot which item appears more in the scene.</div>
-        <span class="card-badge">Comparison</span>
-      </div>
-
-      <div class="game-card" data-game="compound" role="button" tabindex="0" aria-label="Compound Crunch game">
-        <div class="card-icon">➕➖</div>
-        <div class="card-title">Compound Crunch</div>
-        <div class="card-desc">Solve a two-step problem like x + y - z.</div>
-        <span class="card-badge">Compound Operations</span>
+        <div class="card-desc">Wrong division and the characters roll away with ALL the snacks!</div>
+        <span class="card-badge">Add, Subtract &amp; Share</span>
       </div>
 
       <div class="game-card" data-game="weight" role="button" tabindex="0" aria-label="Weight Trouble game">
@@ -81,10 +60,11 @@
       </div>
 
     </div>
+    <button id="open-animation-demo-btn" class="btn btn-primary" style="margin-top:18px;">🐵 Animation Studio</button>
   </section>
 
   <!-- ══════════════════════════════════════
-       GAME SCREEN
+        GAME SCREEN
   ══════════════════════════════════════ -->
   <section id="game-screen" class="screen">
 
@@ -95,7 +75,10 @@
 
     <!-- Milo + question scene -->
     <div class="milo-stage">
-      <span id="milo-char" class="milo-character" aria-label="Milo the monkey">🐵</span>
+      <div id="milo-char" class="milo-character" aria-label="Milo the monkey">
+        <div class="milo-head">🐵</div>
+        <div class="milo-body"></div>
+      </div>
       <div class="question-scene" id="question-scene"></div>
       <p class="question-text" id="question-text"></p>
     </div>
@@ -110,6 +93,26 @@
     <button id="next-btn" class="btn btn-next" style="display:none; margin-top:14px;">Next Question ➡️</button>
     <button id="back-to-menu-btn" class="btn btn-back">⬅ Back to Menu</button>
 
+  </section>
+
+  <!-- ══════════════════════════════════════
+       ANIMATION STUDIO SCREEN
+  ══════════════════════════════════════ -->
+  <section id="animation-screen" class="screen">
+    <h2 class="results-title">🐵 Milo Animation Studio</h2>
+    <p class="results-msg" style="margin-bottom:12px;">Preview Milo's dance, fall, and jumping-for-joy animations.</p>
+    <div class="milo-stage">
+      <div id="milo-demo-char" class="milo-character dancing" aria-label="Milo animation demo character">
+        <div class="milo-head">🐵</div>
+        <div class="milo-body"></div>
+      </div>
+      <div class="animation-demo-buttons" style="justify-content:center;">
+        <button id="demo-dance-btn" class="demo-btn" type="button">Dance</button>
+        <button id="demo-fall-btn" class="demo-btn" type="button">Fall</button>
+        <button id="demo-joy-btn" class="demo-btn" type="button">Jump in Joy</button>
+      </div>
+    </div>
+    <button id="back-from-animation-btn" class="btn btn-back">⬅ Back to Menu</button>
   </section>
 
   <!-- ══════════════════════════════════════
