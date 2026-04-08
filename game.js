@@ -50,6 +50,9 @@ const I18N = {
       counting: { title: 'Counting Chaos 🎈' },
       measuring: { title: 'Measuring Mayhem 📏' },
       sharing: { title: 'Sharing Snacks 🍌' },
+      whoMore: { title: 'Who Has More? 🙋' },
+      whatMore: { title: 'What Is More? 👀' },
+      compound: { title: 'Compound Crunch ➕➖' },
       weight: { title: 'Weight Trouble ⚖️' },
     },
     items: {
@@ -114,6 +117,9 @@ const I18N = {
       counting: { title: 'Счётный хаос 🎈' },
       measuring: { title: 'Измерительный переполох 📏' },
       sharing: { title: 'Делим угощения 🍌' },
+      whoMore: { title: 'У кого больше? 🙋' },
+      whatMore: { title: 'Чего больше? 👀' },
+      compound: { title: 'Сложный счёт ➕➖' },
       weight: { title: 'Весовые неприятности ⚖️' },
     },
     items: {
@@ -178,6 +184,9 @@ const I18N = {
       counting: { title: 'בלגן ספירה 🎈' },
       measuring: { title: 'מהומת מדידה 📏' },
       sharing: { title: 'מחלקים חטיפים 🍌' },
+      whoMore: { title: 'למי יש יותר? 🙋' },
+      whatMore: { title: 'מה יותר? 👀' },
+      compound: { title: 'קראנץ׳ מורכב ➕➖' },
       weight: { title: 'צרות משקל ⚖️' },
     },
     items: {
@@ -242,6 +251,9 @@ const I18N = {
       counting: { title: 'فوضى العد 🎈' },
       measuring: { title: 'فوضى القياس 📏' },
       sharing: { title: 'تقاسم الوجبات 🍌' },
+      whoMore: { title: 'مَنْ عِنْدَهُ أَكْثَر؟ 🙋' },
+      whatMore: { title: 'ما الأَكْثَر؟ 👀' },
+      compound: { title: 'العمليات المركبة ➕➖' },
       weight: { title: 'مشكلة الوزن ⚖️' },
     },
     items: {
@@ -683,9 +695,9 @@ const MINI_GAMES = {
   counting: { titleKey: 'games.counting.title',   makeQuestion: makeCountingQuestion  },
   measuring:{ titleKey: 'games.measuring.title',  makeQuestion: makeMeasuringQuestion },
   sharing:  { titleKey: 'games.sharing.title',    makeQuestion: makeSharingQuestion   },
-  whoMore:  { title: 'Who Has More? 🙋',    makeQuestion: makeWhoHasMoreQuestion },
-  whatMore: { title: 'What Is More? 👀',    makeQuestion: makeWhatIsMoreQuestion },
-  compound: { title: 'Compound Crunch ➕➖', makeQuestion: makeCompoundQuestion   },
+  whoMore:  { titleKey: 'games.whoMore.title',  makeQuestion: makeWhoHasMoreQuestion },
+  whatMore: { titleKey: 'games.whatMore.title', makeQuestion: makeWhatIsMoreQuestion },
+  compound: { titleKey: 'games.compound.title', makeQuestion: makeCompoundQuestion   },
   weight:   { titleKey: 'games.weight.title',     makeQuestion: makeWeightQuestion },
 };
 
