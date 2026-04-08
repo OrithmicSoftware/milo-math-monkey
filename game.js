@@ -125,7 +125,7 @@ function showScreen(id) {
 
 /* ── 1. Counting Chaos ─────────────────────── */
 const COUNTING_ITEMS = [
-  { emoji: '��', name: 'balloons' },
+  { emoji: '🎈', name: 'balloons' },
   { emoji: '🍌', name: 'bananas'  },
   { emoji: '⭐', name: 'stars'    },
   { emoji: '🐝', name: 'bees'     },

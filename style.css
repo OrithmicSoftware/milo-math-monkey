@@ -19,7 +19,7 @@
   --dark:    #333333;
   --shadow:  0 6px 20px rgba(0,0,0,.18);
   --radius:  20px;
-  --font:    'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', cursive;
+  --font:    'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', cursive;
 }
 
 body {
