@@ -195,7 +195,7 @@ const MORE_ITEM_PAIRS = [
   { a: { emoji: '🍎', name: 'apples' }, b: { emoji: '🍌', name: 'bananas' } },
   { a: { emoji: '🌟', name: 'stars' }, b: { emoji: '☁️', name: 'clouds' } },
   { a: { emoji: '🐠', name: 'fish' }, b: { emoji: '🦀', name: 'crabs' } },
-  { a: { emoji: '⚽', name: 'balls' }, b: { emoji: '🏀', name: 'baskets' } },
+  { a: { emoji: '⚽', name: 'balls' }, b: { emoji: '🏀', name: 'basketballs' } },
   { a: { emoji: '🍪', name: 'cookies' }, b: { emoji: '🧁', name: 'cupcakes' } },
 ];
 
@@ -291,7 +291,7 @@ const MINI_GAMES = {
   counting: { title: 'Counting Chaos 🎈',   makeQuestion: makeCountingQuestion  },
   measuring:{ title: 'Measuring Mayhem 📏', makeQuestion: makeMeasuringQuestion },
   sharing:  { title: 'Sharing Snacks 🍌',   makeQuestion: makeSharingQuestion   },
-  whoMore:  { title: 'Who Has More? 🍌',    makeQuestion: makeWhoHasMoreQuestion },
+  whoMore:  { title: 'Who Has More? 🙋',    makeQuestion: makeWhoHasMoreQuestion },
   whatMore: { title: 'What Is More? 👀',    makeQuestion: makeWhatIsMoreQuestion },
   compound: { title: 'Compound Crunch ➕➖', makeQuestion: makeCompoundQuestion   },
   weight:   { title: 'Weight Trouble ⚖️',   makeQuestion: makeWeightQuestion    },
