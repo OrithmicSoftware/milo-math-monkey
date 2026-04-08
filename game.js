@@ -169,11 +169,11 @@ const WEIGHT_PAIRS = [
   { a: { emoji: '🦁', label: 'a lion'           }, b: { emoji: '🐹', label: 'a hamster'        } },
 ];
 
-function makeWeightQuestion() {
-  const pair      = WEIGHT_PAIRS[randInt(0, WEIGHT_PAIRS.length - 1)];
+function makeWeightQuestion(pairOverride) {
+  const pair      = pairOverride || WEIGHT_PAIRS[randInt(0, WEIGHT_PAIRS.length - 1)];
   const askHeavy  = Math.random() < 0.5;
-  const heavyLabel = pair.a.emoji + ' ' + pair.a.label;
-  const lightLabel = pair.b.emoji + ' ' + pair.b.label;
+  const heavyLabel = pair.a.label;
+  const lightLabel = pair.b.label;
   const correct    = askHeavy ? heavyLabel : lightLabel;
   const choices    = shuffle([heavyLabel, lightLabel]);
 
@@ -208,6 +208,19 @@ const MINI_GAMES = {
 // ─────────────────────────────────────────────
 function buildRound(gameKey) {
   const mk = MINI_GAMES[gameKey].makeQuestion;
+  if (gameKey === 'weight') {
+    if (WEIGHT_PAIRS.length === 0) return [];
+    const questions = [];
+    let pairPool = shuffle([...WEIGHT_PAIRS]);
+    while (questions.length < gameState.questionsPerRound) {
+      if (pairPool.length === 0) {
+        pairPool = shuffle([...WEIGHT_PAIRS]);
+      }
+      const pair = pairPool.pop();
+      questions.push(mk(pair));
+    }
+    return questions;
+  }
   return Array.from({ length: gameState.questionsPerRound }, () => mk());
 }
 
