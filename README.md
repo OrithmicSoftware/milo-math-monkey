@@ -79,8 +79,12 @@ GitHub Pages is configured to serve the `gh-pages` branch.
 ├── style.css           # Colorful, kid-friendly styles & animations
 ├── game.js             # Game logic for all four mini-games
 ├── config.js           # Environment flag (production | staging)
+├── sounds/
+│   └── fail/           # Wrong-answer sounds (auto-rotated in order)
 └── .github/
     └── workflows/
         ├── deploy-production.yml   # Production deployment
         └── deploy-staging.yml      # Staging deployment + PR comment
 ```
+
+Wrong-answer sound effects are loaded from `sounds/fail/` and rotated automatically.
