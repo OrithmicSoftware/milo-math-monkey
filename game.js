@@ -14,6 +14,9 @@ const gameState = {
   answered: false,
 };
 
+// Balance trying for unique prompts with avoiding long generation loops.
+const UNIQUE_QUESTION_ATTEMPT_MULTIPLIER = 20;
+
 // ─────────────────────────────────────────────
 //  Utility helpers
 // ─────────────────────────────────────────────
@@ -215,7 +218,29 @@ const MINI_GAMES = {
 // ─────────────────────────────────────────────
 function buildRound(gameKey) {
   const mk = MINI_GAMES[gameKey].makeQuestion;
-  return Array.from({ length: gameState.questionsPerRound }, () => mk());
+  const questions = [];
+  const seenQuestions = new Set();
+  const maxAttempts = gameState.questionsPerRound * UNIQUE_QUESTION_ATTEMPT_MULTIPLIER;
+  let attempts = 0;
+
+  while (questions.length < gameState.questionsPerRound && attempts < maxAttempts) {
+    attempts++;
+    const next = mk();
+    // Questions are prompt-first and use a string `question` field in this codebase.
+    const questionKey =
+      next.question !== undefined
+        ? String(next.question)
+        : JSON.stringify(next);
+    if (seenQuestions.has(questionKey)) continue;
+    seenQuestions.add(questionKey);
+    questions.push(next);
+  }
+
+  while (questions.length < gameState.questionsPerRound) {
+    questions.push(mk());
+  }
+
+  return questions;
 }
 
 // ─────────────────────────────────────────────
