@@ -590,9 +590,9 @@ function makeWhoHasMoreQuestion() {
   let friendCount = randInt(2, 12);
   while (friendCount === miloCount) friendCount = randInt(2, 12);
 
-  const miloChoice = '🐵';
-  const friendChoice = friend.emoji;
-  const correct = miloCount > friendCount ? miloChoice : friendChoice;
+  const miloEmoji = '🐵';
+  const friendEmoji = friend.emoji;
+  const correct = miloCount > friendCount ? miloEmoji : friendEmoji;
 
   return {
     type: 'who-has-more',
@@ -600,7 +600,7 @@ function makeWhoHasMoreQuestion() {
            friend.emoji + ' ' + repeat(item.emoji, friendCount),
     question: t('questions.whoHasMore', { item: itemName }),
     correct,
-    choices: shuffle([miloChoice, friendChoice]),
+    choices: shuffle([miloEmoji, friendEmoji]),
     wrongAnim: 'fall',
     wrongMsg: t('feedback.whoMoreWrong'),
     correctMsg: t('feedback.whoMoreCorrect'),
