@@ -14,6 +14,7 @@ const gameState = {
   answered: false,
 };
 
+// Balance trying for unique prompts with avoiding long generation loops.
 const UNIQUE_QUESTION_ATTEMPT_MULTIPLIER = 20;
 
 // ─────────────────────────────────────────────
@@ -225,9 +226,7 @@ function buildRound(gameKey) {
   while (questions.length < gameState.questionsPerRound && attempts < maxAttempts) {
     attempts++;
     const next = mk();
-    const questionKey = typeof next.question === 'string'
-      ? next.question
-      : JSON.stringify(next.question);
+    const questionKey = String(next.question ?? '');
     if (seenQuestions.has(questionKey)) continue;
     seenQuestions.add(questionKey);
     questions.push(next);
