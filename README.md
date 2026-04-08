@@ -68,11 +68,11 @@ GitHub Pages is configured to serve the `gh-pages` branch.
 ├── game.js             # Game logic for all four mini-games
 ├── config.js           # Environment flag (production | staging)
 ├── sounds/
-│   └── fail/           # Wrong-answer sounds (auto-rotated in order)
+│   └── fail/           # Wrong-answer sounds + manifest.json (auto-rotated)
 └── .github/
     └── workflows/
         ├── deploy-production.yml   # Production deployment
         └── deploy-staging.yml      # Staging deployment + PR comment
 ```
 
-Wrong-answer sound effects are loaded from `sounds/fail/` and rotated automatically.
+Wrong-answer sound effects are loaded from `sounds/fail/manifest.json` (with a directory scan fallback) and rotated automatically.
