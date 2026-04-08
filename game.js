@@ -37,6 +37,7 @@ function repeat(char, n) {
 function playMiloAnimation(el, animationName) {
   if (!el) return;
   el.className = 'milo-character';
+  // Reflow allows restarting CSS animations when switching states.
   void el.offsetWidth;
   el.classList.add(animationName);
 }

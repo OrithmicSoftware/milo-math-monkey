@@ -200,7 +200,7 @@ body {
   display: inline-block;
   transition: transform .3s;
 }
-.milo-character.idle      { animation: idleBounce 1.8s ease-in-out infinite; }
+.milo-character.idle { animation: idleBounce 1.8s ease-in-out infinite; }
 .milo-character.success,
 .milo-character.celebrate { animation: celebrate .6s ease-in-out; }
 .milo-character.tumble    { animation: tumble .8s ease-in-out; }
