@@ -34,6 +34,83 @@ function repeat(char, n) {
   return Array(n).fill(char).join(' ');
 }
 
+const FAIL_SOUNDS_DIR = 'sounds/fail/';
+const FAIL_SOUNDS_MANIFEST = FAIL_SOUNDS_DIR + 'manifest.json';
+const FALLBACK_FAIL_SOUNDS = [
+  'universfield-cartoon-fail-trumpet-278822.mp3',
+  'olivia_parker-fail-2-demo-306647.mp3',
+  'u_8g40a9z0la-fail-234710.mp3',
+  'x_bass6668-funny-meow-110120.mp3',
+  'mangaletp-funny-laughing-406018.mp3',
+].map(file => FAIL_SOUNDS_DIR + file);
+
+const failSoundState = {
+  urls: [...FALLBACK_FAIL_SOUNDS],
+  nextIndex: 0,
+  didScanDirectory: false,
+};
+
+function normalizeFailSoundUrl(fileName) {
+  if (!fileName) return null;
+  try {
+    return FAIL_SOUNDS_DIR + encodeURIComponent(decodeURIComponent(fileName));
+  } catch {
+    return FAIL_SOUNDS_DIR + encodeURIComponent(fileName);
+  }
+}
+
+async function scanFailSoundsDirectory() {
+  if (failSoundState.didScanDirectory || typeof fetch !== 'function') return;
+  failSoundState.didScanDirectory = true;
+
+  try {
+    const manifestResponse = await fetch(FAIL_SOUNDS_MANIFEST, { cache: 'no-store' });
+    if (manifestResponse.ok) {
+      const manifest = await manifestResponse.json();
+      if (Array.isArray(manifest)) {
+        const fromManifest = manifest
+          .map(fileName => normalizeFailSoundUrl(fileName))
+          .filter(Boolean);
+        if (fromManifest.length > 0) {
+          failSoundState.urls = [...new Set(fromManifest)];
+          failSoundState.nextIndex = 0;
+          return;
+        }
+      }
+    }
+
+    const response = await fetch(FAIL_SOUNDS_DIR, { cache: 'no-store' });
+    if (!response.ok) return;
+
+    const html = await response.text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const discovered = [...doc.querySelectorAll('a[href]')]
+      .map(link => link.getAttribute('href') || '')
+      .map(href => href.split('#')[0].split('?')[0])
+      .filter(href => /\.(mp3|ogg|wav|m4a)$/i.test(href))
+      .map(href => normalizeFailSoundUrl(href.split('/').pop()))
+      .filter(Boolean);
+
+    if (discovered.length > 0) {
+      failSoundState.urls = [...new Set(discovered)];
+      failSoundState.nextIndex = 0;
+    }
+  } catch {
+    // Keep fallback list when directory scanning is unavailable.
+  }
+}
+
+function playNextFailSound() {
+  if (failSoundState.urls.length === 0 || typeof Audio !== 'function') return;
+  const url = failSoundState.urls[failSoundState.nextIndex % failSoundState.urls.length];
+  failSoundState.nextIndex += 1;
+
+  const audio = new Audio(url);
+  audio.play().catch(() => {
+    // Ignore autoplay/policy failures.
+  });
+}
+
 // ─────────────────────────────────────────────
 //  Screen navigation
 // ─────────────────────────────────────────────
@@ -410,6 +487,7 @@ function handleAnswer(chosen) {
   } else {
     fb.className = 'feedback-banner wrong';
     fb.innerHTML = '<span class="feedback-icon">😬</span>' + q.wrongMsg;
+    playNextFailSound();
   }
 
   // Show next / finish button
@@ -474,6 +552,7 @@ function startGame(gameKey) {
 //  DOM ready
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  scanFailSoundsDirectory();
 
   // Welcome → Menu
   document.getElementById('play-btn').addEventListener('click', () => {
