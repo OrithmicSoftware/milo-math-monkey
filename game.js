@@ -216,11 +216,16 @@ const MINI_GAMES = {
 function buildRound(gameKey) {
   const mk = MINI_GAMES[gameKey].makeQuestion;
   if (gameKey === 'weight') {
-    const pairPool = shuffle([...WEIGHT_PAIRS]);
-    return Array.from(
-      { length: gameState.questionsPerRound },
-      (_, i) => mk(pairPool[i % pairPool.length])
-    );
+    const questions = [];
+    let pairPool = shuffle([...WEIGHT_PAIRS]);
+    while (questions.length < gameState.questionsPerRound) {
+      if (pairPool.length === 0) {
+        pairPool = shuffle([...WEIGHT_PAIRS]);
+      }
+      const pair = pairPool.pop();
+      questions.push(mk(pair));
+    }
+    return questions;
   }
   return Array.from({ length: gameState.questionsPerRound }, () => mk());
 }
