@@ -288,6 +288,29 @@ function t(path, params) {
   return typeof value === 'string' ? interpolate(value, params) : value;
 }
 
+function getLanguageFromUrlPath() {
+  if (typeof window === 'undefined' || !window.location) return null;
+
+  const segments = window.location.pathname
+    .split('/')
+    .filter(Boolean)
+    .map(segment => {
+      try {
+        return decodeURIComponent(segment).toLowerCase();
+      } catch {
+        return segment.toLowerCase();
+      }
+    });
+
+  for (let i = segments.length - 1; i >= 0; i -= 1) {
+    if (SUPPORTED_LANGUAGES.includes(segments[i])) {
+      return segments[i];
+    }
+  }
+
+  return null;
+}
+
 // ─────────────────────────────────────────────
 //  Utility helpers
 // ─────────────────────────────────────────────
@@ -881,6 +904,11 @@ function startGame(gameKey) {
 //  DOM ready
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  const pathLanguage = getLanguageFromUrlPath();
+  if (pathLanguage) {
+    gameState.language = pathLanguage;
+  }
+
   let storedLanguage = null;
   try {
     if (typeof window !== 'undefined' && window.localStorage) {
@@ -889,7 +917,7 @@ document.addEventListener('DOMContentLoaded', () => {
   } catch (_) {
     storedLanguage = null;
   }
-  if (storedLanguage && SUPPORTED_LANGUAGES.includes(storedLanguage)) {
+  if (!pathLanguage && storedLanguage && SUPPORTED_LANGUAGES.includes(storedLanguage)) {
     gameState.language = storedLanguage;
   }
 
