@@ -226,8 +226,9 @@ function buildRound(gameKey) {
   while (questions.length < gameState.questionsPerRound && attempts < maxAttempts) {
     attempts++;
     const next = mk();
+    // Questions are prompt-first and use a string `question` field in this codebase.
     const questionKey =
-      typeof next.question !== 'undefined'
+      next.question !== undefined
         ? String(next.question)
         : JSON.stringify(next);
     if (seenQuestions.has(questionKey)) continue;
