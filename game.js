@@ -215,7 +215,17 @@ const MINI_GAMES = {
 // ─────────────────────────────────────────────
 function buildRound(gameKey) {
   const mk = MINI_GAMES[gameKey].makeQuestion;
-  return Array.from({ length: gameState.questionsPerRound }, () => mk());
+  const questions = [];
+  const seenQuestions = new Set();
+
+  while (questions.length < gameState.questionsPerRound) {
+    const next = mk();
+    if (seenQuestions.has(next.question)) continue;
+    seenQuestions.add(next.question);
+    questions.push(next);
+  }
+
+  return questions;
 }
 
 // ─────────────────────────────────────────────
