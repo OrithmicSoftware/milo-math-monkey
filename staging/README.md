@@ -48,8 +48,6 @@ open index.html
 start index.html
 ```
 
-Language can also be selected from the URL path when hosted (for example: `/en` or `/he`).
-
 ---
 
 ## 🌐 Deployments
