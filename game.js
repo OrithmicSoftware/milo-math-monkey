@@ -268,8 +268,8 @@ const I18N = {
   },
 };
 
-function getNestedTranslation(path, fallbackLanguage) {
-  const base = I18N[fallbackLanguage];
+function getNestedTranslation(path, language) {
+  const base = I18N[language];
   if (!base) return undefined;
   return path.split('.').reduce((obj, key) => (obj && key in obj ? obj[key] : undefined), base);
 }
@@ -674,7 +674,7 @@ const MINI_GAMES = {
   whoMore:  { title: 'Who Has More? 🙋',    makeQuestion: makeWhoHasMoreQuestion },
   whatMore: { title: 'What Is More? 👀',    makeQuestion: makeWhatIsMoreQuestion },
   compound: { title: 'Compound Crunch ➕➖', makeQuestion: makeCompoundQuestion   },
-  weight:   { titleKey: 'games.weight.title',     title: 'Weight Trouble ⚖️', makeQuestion: makeWeightQuestion },
+  weight:   { titleKey: 'games.weight.title',     makeQuestion: makeWeightQuestion },
 };
 
 // ─────────────────────────────────────────────
