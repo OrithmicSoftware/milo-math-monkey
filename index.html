@@ -14,9 +14,18 @@
   ══════════════════════════════════════ -->
   <section id="welcome-screen" class="screen">
     <div class="logo-badge" aria-label="Milo the monkey hanging from a number 5">🐵</div>
-    <h1 class="game-title">Milo the<br>Math Monkey</h1>
-    <p class="game-slogan">"Count it right… or watch Milo take a tumble!"</p>
+    <h1 id="welcome-title" class="game-title">Milo the<br>Math Monkey</h1>
+    <p id="welcome-slogan" class="game-slogan">"Count it right… or watch Milo take a tumble!"</p>
     <div class="number-decoration" aria-hidden="true">1 2 3 4 5</div>
+    <div class="language-switch-wrap">
+      <span id="language-label" class="language-switch-icon" aria-label="Language">🌐</span>
+      <div id="language-switch" class="language-switch" role="group" aria-label="Language switch">
+        <button type="button" class="lang-switch-btn" data-language="en">EN</button>
+        <button type="button" class="lang-switch-btn" data-language="ru">RU</button>
+        <button type="button" class="lang-switch-btn" data-language="he">עִבְרִית</button>
+        <button type="button" class="lang-switch-btn" data-language="ar">العَرَبِيَّة</button>
+      </div>
+    </div>
     <button id="play-btn" class="btn btn-play">🎮 Play!</button>
   </section>
 

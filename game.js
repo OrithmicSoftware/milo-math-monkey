@@ -145,18 +145,18 @@ const I18N = {
     envBadge: '🚧 СРЕДА STAGING — не для продакшена 🚧',
   },
   he: {
-    welcomeTitle: 'מילו קוף\nהמתמטיקה',
-    welcomeSlogan: '"תספור נכון… או שתראו את מילו מסתבך!"',
-    languageLabel: 'שפה',
-    menuTitle: '🐵 בחרו מיני-משחק!',
+    welcomeTitle: 'מִילוֹ קוֹף\nהַמָּתֵמָטִיקָה',
+    welcomeSlogan: '"תִּסְפְּרוּ נָכוֹן… אוֹ שֶׁתִּרְאוּ אֶת מִילוֹ מִסְתַּבֵּךְ!"',
+    languageLabel: '🌐',
+    menuTitle: '🐵 בַּחֲרוּ מִינִי־מִשְׂחָק!',
     aria: { answers: 'אפשרויות תשובה' },
     buttons: {
-      play: '🎮 משחקים!',
-      nextQuestion: 'שאלה הבאה ➡️',
-      seeResults: 'לתוצאות 🏆',
-      backToMenu: '⬅ חזרה לתפריט',
-      playAgain: '🔄 משחקים שוב',
-      chooseGame: '🎮 בוחרים משחק',
+      play: '🎮 מְשַׂחֲקִים!',
+      nextQuestion: 'שְׁאֵלָה הַבָּאָה ➡️',
+      seeResults: 'לַתּוֹצָאוֹת 🏆',
+      backToMenu: '⬅ חֲזָרָה לַתַּפְרִיט',
+      playAgain: '🔄 מְשַׂחֲקִים שׁוּב',
+      chooseGame: '🎮 בּוֹחֲרִים מִשְׂחָק',
     },
     labels: { score: '⭐ ניקוד: {score} / {total}', questionCounter: 'שאלה {current} / {total}' },
     cards: {
@@ -206,18 +206,18 @@ const I18N = {
     envBadge: '🚧 סביבת STAGING — לא לשימוש בייצור 🚧',
   },
   ar: {
-    welcomeTitle: 'ميلو قرد\nالرياضيات',
-    welcomeSlogan: '"عدّها جيدًا… وإلا سيتعثر ميلو!"',
-    languageLabel: 'اللغة',
-    menuTitle: '🐵 اختر لعبة صغيرة!',
+    welcomeTitle: 'مِيلُو قِرْد\nالرِّيَاضِيَّات',
+    welcomeSlogan: '"عُدَّهَا جَيِّدًا… وَإِلَّا سَيَتَعَثَّرُ مِيلُو!"',
+    languageLabel: '🌐',
+    menuTitle: '🐵 اِخْتَرْ لُعْبَةً صَغِيرَةً!',
     aria: { answers: 'خيارات الإجابة' },
     buttons: {
-      play: '🎮 العب!',
-      nextQuestion: 'السؤال التالي ➡️',
-      seeResults: 'عرض النتائج 🏆',
-      backToMenu: '⬅ العودة للقائمة',
-      playAgain: '🔄 العب مرة أخرى',
-      chooseGame: '🎮 اختر لعبة',
+      play: '🎮 اِلْعَبْ!',
+      nextQuestion: 'السُّؤَالُ التَّالِي ➡️',
+      seeResults: 'عَرْضُ النَّتَائِجِ 🏆',
+      backToMenu: '⬅ العَوْدَةُ لِلْقَائِمَةِ',
+      playAgain: '🔄 اِلْعَبْ مَرَّةً أُخْرَى',
+      chooseGame: '🎮 اِخْتَرْ لُعْبَةً',
     },
     labels: { score: '⭐ النتيجة: {score} / {total}', questionCounter: 'سؤال {current} / {total}' },
     cards: {
@@ -706,13 +706,32 @@ function setText(id, value) {
   el.textContent = value;
 }
 
+function updateLanguageSwitchUi() {
+  document.querySelectorAll('.lang-switch-btn').forEach(btn => {
+    const isActive = btn.dataset.language === gameState.language;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+}
+
+function setLanguage(nextLanguage) {
+  if (!SUPPORTED_LANGUAGES.includes(nextLanguage)) return;
+  gameState.language = nextLanguage;
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem('milo-language', gameState.language);
+    }
+  } catch (_) {}
+  applyLanguage();
+}
+
 function applyLanguage() {
   document.documentElement.lang = gameState.language;
   document.documentElement.dir = RTL_LANGUAGES.has(gameState.language) ? 'rtl' : 'ltr';
 
   setText('welcome-title', t('welcomeTitle'));
   setText('welcome-slogan', t('welcomeSlogan'));
-  setText('language-label', t('languageLabel'));
+  setText('language-label', '🌐');
   setText('play-btn', t('buttons.play'));
   setText('menu-title', t('menuTitle'));
   setText('card-counting-title', t('cards.counting.title'));
@@ -739,6 +758,7 @@ function applyLanguage() {
     answersGrid.setAttribute('aria-label', t('aria.answers'));
   }
 
+  updateLanguageSwitchUi();
   updateScoreDisplay();
 }
 
@@ -925,19 +945,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   applyLanguage();
 
+  document.querySelectorAll('.lang-switch-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      setLanguage(btn.dataset.language);
+    });
+  });
+
   const languageSelect = document.getElementById('language-select');
   if (languageSelect) {
     languageSelect.value = gameState.language;
     languageSelect.addEventListener('change', event => {
-      const nextLanguage = event.target.value;
-      if (!SUPPORTED_LANGUAGES.includes(nextLanguage)) return;
-      gameState.language = nextLanguage;
-      try {
-        if (typeof window !== 'undefined' && window.localStorage) {
-          window.localStorage.setItem('milo-language', gameState.language);
-        }
-      } catch (_) {}
-      applyLanguage();
+      setLanguage(event.target.value);
     });
   }
 
