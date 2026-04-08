@@ -217,12 +217,19 @@ function buildRound(gameKey) {
   const mk = MINI_GAMES[gameKey].makeQuestion;
   const questions = [];
   const seenQuestions = new Set();
+  const maxAttempts = gameState.questionsPerRound * 20;
+  let attempts = 0;
 
-  while (questions.length < gameState.questionsPerRound) {
+  while (questions.length < gameState.questionsPerRound && attempts < maxAttempts) {
+    attempts++;
     const next = mk();
     if (seenQuestions.has(next.question)) continue;
     seenQuestions.add(next.question);
     questions.push(next);
+  }
+
+  while (questions.length < gameState.questionsPerRound) {
+    questions.push(mk());
   }
 
   return questions;
