@@ -40,6 +40,7 @@ button {
 }
 
 button:hover,
+button:focus,
 button:focus-visible {
   transform: translateY(-1px);
   box-shadow: 0 10px 20px rgba(137, 88, 14, 0.24);
@@ -208,19 +209,19 @@ h1 {
 }
 
 .milo {
-  transform-origin: 180px 232px;
+  transform-origin: 50% 92%;
   transform-box: fill-box;
   animation: idle-bob 2.8s ease-in-out infinite;
 }
 
 .head {
-  transform-origin: 80px 65px;
+  transform-origin: 50% 58%;
   transform-box: fill-box;
   animation: head-tilt 3.2s ease-in-out infinite;
 }
 
 .tail {
-  transform-origin: 106px 189px;
+  transform-origin: 12% 68%;
   transform-box: fill-box;
   animation: tail-swish 2.2s ease-in-out infinite;
 }
@@ -238,6 +239,8 @@ h1 {
 }
 
 body.is-reaching .front-arm {
+  transform-origin: 55% 80%;
+  transform-box: fill-box;
   animation: reach 0.9s ease-in-out 2 alternate;
 }
 

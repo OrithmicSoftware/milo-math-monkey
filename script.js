@@ -34,6 +34,7 @@ const SOUND_PRESETS = deepFreeze({
 });
 
 const TRANSIENT_ANIMATION_CLASSES = ['is-reaching', 'is-celebrating'];
+const REDUCED_MOTION_DURATION_MS = 120;
 
 class ToneEngine {
   constructor(soundPresets) {
@@ -47,12 +48,14 @@ class ToneEngine {
     if (!this.soundNames.length) {
       return null;
     }
-    if (window.crypto?.getRandomValues) {
-      const entropy = new Uint32Array(1);
-      window.crypto.getRandomValues(entropy);
-      return this.soundNames[entropy[0] % this.soundNames.length];
-    }
-    return this.soundNames[Math.floor(Math.random() * this.soundNames.length)];
+    const randomIndex = window.crypto?.getRandomValues
+      ? (() => {
+          const entropy = new Uint32Array(1);
+          window.crypto.getRandomValues(entropy);
+          return entropy[0] % this.soundNames.length;
+        })()
+      : Math.floor(Math.random() * this.soundNames.length);
+    return this.soundNames[randomIndex];
   }
 
   async play(name) {
@@ -203,7 +206,7 @@ class MiloPrototypeController {
       this.body.classList.add(className);
     });
 
-    const timeoutMs = this.reduceMotion ? 120 : durationMs;
+    const timeoutMs = this.reduceMotion ? REDUCED_MOTION_DURATION_MS : durationMs;
     const timerId = window.setTimeout(() => {
       this.body.classList.remove(className);
       this.timers.delete(className);
