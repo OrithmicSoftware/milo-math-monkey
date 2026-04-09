@@ -19,7 +19,7 @@
   --dark:    #333333;
   --shadow:  0 6px 20px rgba(0,0,0,.18);
   --radius:  20px;
-  --font:    'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', cursive;
+  --font:    'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', cursive;
 }
 
 body {
@@ -77,52 +77,6 @@ body {
   animation: colorCycle 3s linear infinite;
 }
 
-.language-switch-wrap {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.2);
-  border: 2px solid rgba(255, 255, 255, 0.45);
-  border-radius: 999px;
-  padding: 8px 10px;
-  margin-bottom: 24px;
-}
-
-.language-switch-icon {
-  font-size: 1.2rem;
-  line-height: 1;
-}
-
-.language-switch {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.lang-switch-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 6px 12px;
-  font-family: var(--font);
-  font-size: .95rem;
-  line-height: 1;
-  background: rgba(255, 255, 255, 0.88);
-  color: var(--dark);
-  cursor: pointer;
-  transition: transform .15s, box-shadow .15s, background .15s, color .15s;
-}
-
-.lang-switch-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 10px rgba(0,0,0,.16);
-}
-
-.lang-switch-btn.active {
-  background: var(--purple);
-  color: var(--white);
-}
-
 @keyframes colorCycle {
   0%   { color: var(--white); }
   25%  { color: var(--blue);  }
@@ -154,39 +108,104 @@ body {
 .btn-next    { background: var(--purple); color: var(--white); }
 
 /* ── Menu screen ── */
-#menu-screen { background: linear-gradient(135deg, #e0f7fa 0%, #fff9c4 100%); }
+#menu-screen { background: linear-gradient(180deg, #34c9ff 0%, #00a4df 55%, #0092cf 100%); }
 
 .menu-header { text-align: center; margin-bottom: 30px; }
-.menu-header h2 { font-size: clamp(1.6rem, 4vw, 2.4rem); color: var(--orange); }
-.score-display  { font-size: 1.2rem; color: var(--purple); margin-top: 6px; }
+.menu-header h2 { font-size: clamp(1.6rem, 4vw, 2.4rem); color: var(--white); text-shadow: 2px 2px 0 rgba(0,0,0,.16); }
+.score-display  { font-size: 1.2rem; color: #fff9c4; margin-top: 6px; }
 
 .games-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
+  position: relative;
   width: 100%;
-  max-width: 900px;
+  max-width: 940px;
+  min-height: 430px;
+}
+
+.level-map {
+  border-radius: 28px;
+  background: radial-gradient(circle at 20% 20%, #81f4ff 0%, #2ec8f3 35%, #10a8dd 100%);
+  box-shadow: 0 16px 36px rgba(0,0,0,.22);
+  overflow: hidden;
+  padding: 14px;
+}
+
+.map-path {
+  position: absolute;
+  left: 9%;
+  right: 9%;
+  top: 43%;
+  height: 12px;
+  border-radius: 999px;
+  background: #ffe48d;
+  box-shadow: 0 0 0 4px rgba(255,255,255,.5);
+  transform: rotate(-6deg);
 }
 
 .game-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 24px 20px;
+  position: absolute;
+  width: 180px;
+  min-height: 120px;
+  background: linear-gradient(180deg, #7ed957 0%, #4caf50 100%);
+  border-radius: 34px;
+  padding: 12px 14px 10px;
   text-align: center;
   cursor: pointer;
-  box-shadow: var(--shadow);
-  border: 4px solid transparent;
-  transition: transform .2s, border-color .2s, box-shadow .2s;
+  box-shadow: 0 10px 20px rgba(0,0,0,.2);
+  border: 4px solid #fceeb8;
+  transition: transform .2s, border-color .2s, box-shadow .2s, filter .2s;
 }
 .game-card:hover {
-  transform: translateY(-6px) rotate(1deg);
+  transform: translateY(-6px) scale(1.03);
   border-color: var(--yellow);
-  box-shadow: 0 14px 32px rgba(0,0,0,.22);
+  box-shadow: 0 16px 32px rgba(0,0,0,.3);
+  filter: saturate(1.08);
 }
-.game-card .card-icon  { font-size: 3.5rem; margin-bottom: 10px; }
-.game-card .card-title { font-size: 1.2rem; color: var(--orange); font-weight: bold; margin-bottom: 6px; }
-.game-card .card-desc  { font-size: .9rem; color: #666; }
-.game-card .card-badge { display: inline-block; margin-top: 8px; background: var(--yellow); border-radius: 12px; padding: 3px 12px; font-size: .8rem; color: var(--dark); }
+.level-number {
+  position: absolute;
+  top: -12px;
+  left: -10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f443a6;
+  color: var(--white);
+  font-size: 1.1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,.25);
+}
+.game-card .card-icon  { font-size: 2.3rem; margin-bottom: 2px; }
+.game-card .card-title { font-size: .95rem; color: var(--white); font-weight: bold; line-height: 1.2; }
+
+.level-1 { left: 5%;  top: 54%; }
+.level-2 { left: 24%; top: 24%; }
+.level-3 { left: 44%; top: 18%; }
+.level-4 { left: 65%; top: 44%; }
+
+.treasure-island {
+  position: absolute;
+  right: 4%;
+  top: 14%;
+  width: 120px;
+  height: 92px;
+  border-radius: 40px;
+  border: 4px solid #fceeb8;
+  background: linear-gradient(180deg, #7ed957 0%, #3f9b48 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.6rem;
+  box-shadow: 0 10px 20px rgba(0,0,0,.2);
+}
+
+.map-help {
+  margin-top: 16px;
+  color: var(--white);
+  text-shadow: 1px 1px 0 rgba(0,0,0,.2);
+  font-size: 1rem;
+}
 
 /* ── Game screen ── */
 #game-screen { background: linear-gradient(135deg, #f3e5f5 0%, #e8f5e9 100%); }
@@ -365,8 +384,48 @@ body {
 .seesaw-pivot { display: flex; flex-direction: column; align-items: center; }
 
 /* ── Responsive ── */
+@media (max-width: 900px) and (min-width: 481px) {
+  .games-grid { min-height: 520px; }
+  .game-card {
+    width: 160px;
+    min-height: 112px;
+  }
+  .level-1 { left: 6%;  top: 62%; }
+  .level-2 { left: 20%; top: 33%; }
+  .level-3 { left: 47%; top: 20%; }
+  .level-4 { left: 68%; top: 44%; }
+  .treasure-island {
+    right: 5%;
+    top: 8%;
+    width: 110px;
+    height: 86px;
+  }
+}
+
 @media (max-width: 480px) {
   .answers-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .games-grid   { grid-template-columns: 1fr 1fr; }
+  .games-grid   { min-height: 620px; }
   .answer-btn   { padding: 14px 8px; }
+  .game-card {
+    width: 150px;
+    min-height: 105px;
+    padding: 10px 10px 8px;
+  }
+  .level-1 { left: 8%;  top: 68%; }
+  .level-2 { left: 8%;  top: 39%; }
+  .level-3 { left: 52%; top: 22%; }
+  .level-4 { left: 52%; top: 53%; }
+  .treasure-island {
+    width: 100px;
+    height: 80px;
+    right: 7%;
+    top: 3%;
+    font-size: 2.1rem;
+  }
+  .map-path {
+    left: 14%;
+    right: 14%;
+    top: 50%;
+    transform: rotate(22deg);
+  }
 }
