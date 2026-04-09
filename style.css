@@ -224,6 +224,8 @@ body {
 }
 .game-card .card-icon  { font-size: 2.3rem; margin-bottom: 2px; }
 .game-card .card-title { font-size: .95rem; color: var(--white); font-weight: bold; line-height: 1.2; }
+.level-map .card-desc,
+.level-map .card-badge { display: none; }
 
 .level-1 { left: 5%;  top: 54%; }
 .level-2 { left: 24%; top: 24%; }
