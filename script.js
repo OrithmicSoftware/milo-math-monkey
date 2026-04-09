@@ -1,4 +1,15 @@
-const SOUND_PRESETS = Object.freeze({
+function deepFreeze(value) {
+  if (!value || typeof value !== 'object' || Object.isFrozen(value)) {
+    return value;
+  }
+  Object.freeze(value);
+  Object.getOwnPropertyNames(value).forEach((name) => {
+    deepFreeze(value[name]);
+  });
+  return value;
+}
+
+const SOUND_PRESETS = deepFreeze({
   hoot: [
     { frequency: 440, duration: 0.08, type: 'triangle', gain: 0.14 },
     { frequency: 590, duration: 0.12, type: 'triangle', gain: 0.12 },
@@ -70,6 +81,10 @@ class ToneEngine {
       try {
         await this.audioContext.resume();
       } catch (error) {
+        console.warn(
+          'Unable to resume audio context. User interaction may be required to enable audio.',
+          error
+        );
         return false;
       }
     }
@@ -105,12 +120,20 @@ class MiloPrototypeController {
     this.statusEl = root.querySelector('[data-status]');
     this.timers = new Map();
     this.engine = new ToneEngine(SOUND_PRESETS);
-    this.reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+    this.motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    this.reduceMotion = this.motionQuery ? this.motionQuery.matches : false;
   }
 
   init() {
     this.root.addEventListener('click', (event) => this.onClick(event));
-    this.setStatus('Ready. Try Reach, Celebrate, or a funny sound.');
+    if (this.motionQuery?.addEventListener) {
+      this.motionQuery.addEventListener('change', (event) => {
+        this.reduceMotion = event.matches;
+      });
+    } else if (!this.motionQuery) {
+      console.info('Reduced-motion preference monitoring is unavailable in this browser.');
+    }
+    this.setStatus('Ready. Use the controls to trigger movement and sounds.');
   }
 
   onClick(event) {
@@ -155,7 +178,7 @@ class MiloPrototypeController {
     }
   }
 
-  async playSound(name, successMessage) {
+  async playSound(name, successMessage = null) {
     const ok = await this.engine.play(name);
     if (ok) {
       this.setStatus(successMessage || `Played sound: ${name}.`);
@@ -175,6 +198,7 @@ class MiloPrototypeController {
     this.cancelTimer(className);
     this.body.classList.remove(className);
 
+    // Restart CSS animation by re-adding the class in the next frame.
     window.requestAnimationFrame(() => {
       this.body.classList.add(className);
     });
