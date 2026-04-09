@@ -93,8 +93,8 @@ const I18N = {
     envBadge: '🚧 STAGING ENVIRONMENT — not for production use 🚧',
   },
   ru: {
-    welcomeTitle: 'Мило —\nМатематическая Обезьянка',
-    welcomeSlogan: '"Считай правильно… или Мило снова попадёт в беду!"',
+    welcomeTitle: 'Малёк - мартышка-математик',
+    welcomeSlogan: 'Считай правильно, или Мальку не поздоровится!',
     languageLabel: 'Язык',
     menuTitle: '🐵 Выбери мини-игру!',
     aria: { answers: 'Варианты ответа' },
