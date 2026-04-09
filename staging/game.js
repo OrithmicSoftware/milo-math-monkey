@@ -537,7 +537,6 @@ const SNACK_ITEMS = [
 
 function makeSharingQuestion() {
   const item  = SNACK_ITEMS[randInt(0, SNACK_ITEMS.length - 1)];
-  const mode  = randInt(0, 1); // 0=addition  1=subtraction
   const itemName = t('items.snacks.' + item.nameKey);
   const mode  = randInt(0, 2); // 0=addition  1=subtraction  2=division
 
@@ -559,7 +558,7 @@ function makeSharingQuestion() {
     const total     = friends * perFriend;
     correct  = perFriend;
     scene    = repeat(item.emoji, total);
-    question = 'Milo shares ' + total + ' ' + item.name + ' equally among ' + friends + ' friends. How many each?';
+    question = 'Milo shares ' + total + ' ' + itemName + ' equally among ' + friends + ' friends. How many each?';
   }
 
   const distractors = new Set();
