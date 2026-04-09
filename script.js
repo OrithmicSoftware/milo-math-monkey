@@ -1,4 +1,4 @@
-const soundPresets = {
+const SOUND_PRESETS = Object.freeze({
   hoot: [
     { frequency: 440, duration: 0.08, type: 'triangle', gain: 0.14 },
     { frequency: 590, duration: 0.12, type: 'triangle', gain: 0.12 },
@@ -20,103 +20,187 @@ const soundPresets = {
     { frequency: 460, duration: 0.05, type: 'square', gain: 0.08 },
     { frequency: 320, duration: 0.08, type: 'square', gain: 0.06 },
   ],
-};
-
-const soundNames = Object.keys(soundPresets);
-const audioContext =
-  window.AudioContext || window.webkitAudioContext
-    ? new (window.AudioContext || window.webkitAudioContext)()
-    : null;
-
-function clearState(className, delay = 1100) {
-  window.clearTimeout(clearState.timers?.[className]);
-  clearState.timers = clearState.timers || {};
-  clearState.timers[className] = window.setTimeout(() => {
-    document.body.classList.remove(className);
-  }, delay);
-}
-
-function animateCharacter(className, delay) {
-  document.body.classList.add(className);
-  clearState(className, delay);
-}
-
-function playTone(startTime, { frequency, duration, type, gain }) {
-  if (!audioContext) {
-    return startTime;
-  }
-
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
-
-  oscillator.type = type;
-  oscillator.frequency.setValueAtTime(frequency, startTime);
-
-  gainNode.gain.setValueAtTime(0.0001, startTime);
-  gainNode.gain.exponentialRampToValueAtTime(gain, startTime + 0.02);
-  gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
-
-  oscillator.start(startTime);
-  oscillator.stop(startTime + duration);
-
-  return startTime + duration * 0.82;
-}
-
-async function ensureAudioReady() {
-  if (!audioContext) {
-    return false;
-  }
-
-  if (audioContext.state === 'suspended') {
-    await audioContext.resume();
-  }
-
-  return true;
-}
-
-async function playSound(name) {
-  const preset = soundPresets[name];
-
-  if (!preset) {
-    return;
-  }
-
-  await ensureAudioReady();
-
-  if (!audioContext) {
-    return;
-  }
-
-  let cursor = audioContext.currentTime;
-  preset.forEach((tone) => {
-    cursor = playTone(cursor, tone);
-  });
-}
-
-function playRandomSound() {
-  const randomName = soundNames[Math.floor(Math.random() * soundNames.length)];
-  playSound(randomName);
-}
-
-document.querySelectorAll('[data-sound]').forEach((button) => {
-  button.addEventListener('click', () => {
-    playSound(button.dataset.sound);
-  });
 });
 
-document.querySelector('[data-action="reach"]')?.addEventListener('click', () => {
-  animateCharacter('is-reaching', 1800);
-  playSound('gasp');
-});
+const TRANSIENT_ANIMATION_CLASSES = ['is-reaching', 'is-celebrating'];
 
-document.querySelector('[data-action="celebrate"]')?.addEventListener('click', () => {
-  animateCharacter('is-celebrating', 1700);
-  playSound('hoot');
-});
+class ToneEngine {
+  constructor(soundPresets) {
+    this.soundPresets = soundPresets;
+    this.soundNames = Object.keys(soundPresets);
+    this.audioContext = null;
+    this.AudioContextCtor = window.AudioContext || window.webkitAudioContext || null;
+  }
 
-document
-  .querySelector('[data-action="random-sound"]')
-  ?.addEventListener('click', playRandomSound);
+  randomSoundName() {
+    if (!this.soundNames.length) {
+      return null;
+    }
+    if (window.crypto?.getRandomValues) {
+      const entropy = new Uint32Array(1);
+      window.crypto.getRandomValues(entropy);
+      return this.soundNames[entropy[0] % this.soundNames.length];
+    }
+    return this.soundNames[Math.floor(Math.random() * this.soundNames.length)];
+  }
+
+  async play(name) {
+    const preset = this.soundPresets[name];
+    if (!preset || !(await this.ensureReady())) {
+      return false;
+    }
+
+    let cursor = this.audioContext.currentTime;
+    preset.forEach((tone) => {
+      cursor = this.playTone(cursor, tone);
+    });
+    return true;
+  }
+
+  async ensureReady() {
+    if (!this.AudioContextCtor) {
+      return false;
+    }
+
+    if (!this.audioContext) {
+      this.audioContext = new this.AudioContextCtor();
+    }
+
+    if (this.audioContext.state === 'suspended') {
+      try {
+        await this.audioContext.resume();
+      } catch (error) {
+        return false;
+      }
+    }
+
+    return this.audioContext.state === 'running';
+  }
+
+  playTone(startTime, { frequency, duration, type, gain }) {
+    const oscillator = this.audioContext.createOscillator();
+    const gainNode = this.audioContext.createGain();
+
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, startTime);
+
+    gainNode.gain.setValueAtTime(0.0001, startTime);
+    gainNode.gain.exponentialRampToValueAtTime(gain, startTime + 0.02);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(this.audioContext.destination);
+
+    oscillator.start(startTime);
+    oscillator.stop(startTime + duration);
+
+    return startTime + duration * 0.82;
+  }
+}
+
+class MiloPrototypeController {
+  constructor(root = document) {
+    this.root = root;
+    this.body = root.body;
+    this.statusEl = root.querySelector('[data-status]');
+    this.timers = new Map();
+    this.engine = new ToneEngine(SOUND_PRESETS);
+    this.reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+  }
+
+  init() {
+    this.root.addEventListener('click', (event) => this.onClick(event));
+    this.setStatus('Ready. Try Reach, Celebrate, or a funny sound.');
+  }
+
+  onClick(event) {
+    const button = event.target.closest('button');
+    if (!button) {
+      return;
+    }
+
+    const action = button.dataset.action;
+    const sound = button.dataset.sound;
+
+    if (action) {
+      this.handleAction(action);
+      return;
+    }
+
+    if (sound) {
+      this.playSound(sound);
+    }
+  }
+
+  async handleAction(action) {
+    if (action === 'reach') {
+      this.playAnimation('is-reaching', 1800);
+      await this.playSound('gasp', 'Milo reached for bananas.');
+      return;
+    }
+
+    if (action === 'celebrate') {
+      this.playAnimation('is-celebrating', 1700);
+      await this.playSound('hoot', 'Milo is celebrating.');
+      return;
+    }
+
+    if (action === 'random-sound') {
+      const soundName = this.engine.randomSoundName();
+      if (!soundName) {
+        this.setStatus('No sound preset is available.');
+        return;
+      }
+      await this.playSound(soundName, `Played random sound: ${soundName}.`);
+    }
+  }
+
+  async playSound(name, successMessage) {
+    const ok = await this.engine.play(name);
+    if (ok) {
+      this.setStatus(successMessage || `Played sound: ${name}.`);
+    } else {
+      this.setStatus('Audio is unavailable in this browser right now.');
+    }
+  }
+
+  playAnimation(className, durationMs) {
+    TRANSIENT_ANIMATION_CLASSES.forEach((animationClass) => {
+      if (animationClass !== className) {
+        this.cancelTimer(animationClass);
+        this.body.classList.remove(animationClass);
+      }
+    });
+
+    this.cancelTimer(className);
+    this.body.classList.remove(className);
+
+    window.requestAnimationFrame(() => {
+      this.body.classList.add(className);
+    });
+
+    const timeoutMs = this.reduceMotion ? 120 : durationMs;
+    const timerId = window.setTimeout(() => {
+      this.body.classList.remove(className);
+      this.timers.delete(className);
+    }, timeoutMs);
+
+    this.timers.set(className, timerId);
+  }
+
+  cancelTimer(key) {
+    const timer = this.timers.get(key);
+    if (timer) {
+      window.clearTimeout(timer);
+      this.timers.delete(key);
+    }
+  }
+
+  setStatus(message) {
+    if (this.statusEl) {
+      this.statusEl.textContent = message;
+    }
+  }
+}
+
+new MiloPrototypeController(document).init();
