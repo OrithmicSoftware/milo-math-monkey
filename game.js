@@ -822,6 +822,7 @@ function applyLanguage() {
 // ─────────────────────────────────────────────
 function renderQuestion() {
   const q = gameState.currentQ;
+  const hasMathFormula = /[+\-−=÷×➕➖]/.test(q.scene || '') || /[+\-−=÷×]/.test(q.question || '');
 
   document.getElementById('game-title-label').textContent = getGameTitle(gameState.activeGame);
   document.getElementById('question-counter').textContent =
@@ -852,8 +853,11 @@ function renderQuestion() {
   } else {
     sceneEl.innerHTML = '<div class="question-emoji-row">' + q.scene + '</div>';
   }
+  sceneEl.dir = hasMathFormula ? 'ltr' : '';
 
-  document.getElementById('question-text').textContent = q.question;
+  const questionTextEl = document.getElementById('question-text');
+  questionTextEl.textContent = q.question;
+  questionTextEl.dir = hasMathFormula ? 'ltr' : '';
 
   // Answer buttons
   const grid = document.getElementById('answers-grid');
