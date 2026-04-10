@@ -12,7 +12,7 @@ Milo is a goofy, overconfident monkey who loves numbers — but always gets into
 |---|---|---|
 | 🎈 **Counting Chaos** | Counting 1–20 | Too many balloons — Milo flies away! |
 | 📏 **Measuring Mayhem** | Size & comparison | Wrong answer — Milo falls into jelly! |
-| 🍌 **Sharing Snacks** | Addition, subtraction & division | Wrong share — characters roll off with ALL the snacks! |
+| 🍌 **Sharing Snacks** | Addition & subtraction | Wrong share — characters roll off with ALL the snacks! |
 | ⚖️ **Weight Trouble** | Heavier & lighter | Wrong comparison — Milo gets launched off the seesaw! |
 
 ## 🧠 Learning Focus
@@ -72,4 +72,3 @@ GitHub Pages is configured to serve the `gh-pages` branch.
         ├── deploy-production.yml   # Production deployment
         └── deploy-staging.yml      # Staging deployment + PR comment
 ```
-
