@@ -17,6 +17,8 @@ const gameState = {
 
 const SUPPORTED_LANGUAGES = ['en', 'ru', 'he', 'ar'];
 const RTL_LANGUAGES = new Set(['he', 'ar']);
+const LTR_DIRECTION = 'ltr';
+const MATH_FORMULA_PATTERN = /[+\-−=÷×*\/➕➖]/;
 
 const I18N = {
   en: {
@@ -822,6 +824,8 @@ function applyLanguage() {
 // ─────────────────────────────────────────────
 function renderQuestion() {
   const q = gameState.currentQ;
+  const formulaText = `${q.scene ?? ''} ${q.question ?? ''}`;
+  const hasMathFormula = MATH_FORMULA_PATTERN.test(formulaText);
 
   document.getElementById('game-title-label').textContent = getGameTitle(gameState.activeGame);
   document.getElementById('question-counter').textContent =
@@ -852,8 +856,11 @@ function renderQuestion() {
   } else {
     sceneEl.innerHTML = '<div class="question-emoji-row">' + q.scene + '</div>';
   }
+  sceneEl.dir = hasMathFormula ? LTR_DIRECTION : '';
 
-  document.getElementById('question-text').textContent = q.question;
+  const questionTextEl = document.getElementById('question-text');
+  questionTextEl.textContent = q.question;
+  questionTextEl.dir = hasMathFormula ? LTR_DIRECTION : '';
 
   // Answer buttons
   const grid = document.getElementById('answers-grid');
