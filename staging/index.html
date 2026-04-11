@@ -14,9 +14,18 @@
   ══════════════════════════════════════ -->
   <section id="welcome-screen" class="screen">
     <div class="logo-badge" aria-label="Milo the monkey hanging from a number 5">🐵</div>
-    <h1 class="game-title">Milo the<br>Math Monkey</h1>
-    <p class="game-slogan">"Count it right… or watch Milo take a tumble!"</p>
+    <h1 id="welcome-title" class="game-title">Milo the<br>Math Monkey</h1>
+    <p id="welcome-slogan" class="game-slogan">"Count it right… or watch Milo take a tumble!"</p>
     <div class="number-decoration" aria-hidden="true">1 2 3 4 5</div>
+    <div class="language-switch-wrap">
+      <span id="language-label" class="language-switch-icon" aria-label="Language">🌐</span>
+      <div id="language-switch" class="language-switch" role="group" aria-label="Language switch">
+        <button type="button" class="lang-switch-btn" data-language="en">EN</button>
+        <button type="button" class="lang-switch-btn" data-language="ru">RU</button>
+        <button type="button" class="lang-switch-btn" data-language="he" lang="he">עִבְרִית</button>
+        <button type="button" class="lang-switch-btn" data-language="ar" lang="ar">العَرَبِيَّة</button>
+      </div>
+    </div>
     <button id="play-btn" class="btn btn-play">🎮 Play!</button>
   </section>
 
@@ -25,7 +34,7 @@
   ══════════════════════════════════════ -->
   <section id="menu-screen" class="screen">
     <div class="menu-header">
-      <h2>🐵 Choose a Mini-Game!</h2>
+      <h2 id="menu-title">🐵 Choose a Mini-Game!</h2>
       <p class="score-display" id="score-display">⭐ Score: 0 / 0</p>
     </div>
 
@@ -33,30 +42,51 @@
 
       <div class="game-card" data-game="counting" role="button" tabindex="0" aria-label="Counting Chaos game">
         <div class="card-icon">🎈</div>
-        <div class="card-title">Counting Chaos</div>
-        <div class="card-desc">Count the items before Milo grabs too many balloons and flies away!</div>
-        <span class="card-badge">Counting 1–20</span>
+        <div id="card-counting-title" class="card-title">Counting Chaos</div>
+        <div id="card-counting-desc" class="card-desc">Count the items before Milo grabs too many balloons and flies away!</div>
+        <span id="card-counting-badge" class="card-badge">Counting 1–20</span>
       </div>
 
       <div class="game-card" data-game="measuring" role="button" tabindex="0" aria-label="Measuring Mayhem game">
         <div class="card-icon">📏</div>
-        <div class="card-title">Measuring Mayhem</div>
-        <div class="card-desc">Get it wrong and Milo falls face-first into the jelly!</div>
-        <span class="card-badge">Size &amp; Comparison</span>
+        <div id="card-measuring-title" class="card-title">Measuring Mayhem</div>
+        <div id="card-measuring-desc" class="card-desc">Get it wrong and Milo falls face-first into the jelly!</div>
+        <span id="card-measuring-badge" class="card-badge">Size &amp; Comparison</span>
       </div>
 
       <div class="game-card" data-game="sharing" role="button" tabindex="0" aria-label="Sharing Snacks game">
         <div class="card-icon">🍌</div>
-        <div class="card-title">Sharing Snacks</div>
-        <div class="card-desc">Wrong division and the characters roll away with ALL the snacks!</div>
-        <span class="card-badge">Add, Subtract &amp; Share</span>
+        <div id="card-sharing-title" class="card-title">Sharing Snacks</div>
+        <div id="card-sharing-desc" class="card-desc">Wrong answer and the characters roll away with ALL the snacks!</div>
+        <span id="card-sharing-badge" class="card-badge">Addition &amp; Subtraction</span>
+      </div>
+
+      <div class="game-card" data-game="whoMore" role="button" tabindex="0" aria-label="Who Has More game">
+        <div class="card-icon">🙋</div>
+        <div id="card-who-more-title" class="card-title">Who Has More?</div>
+        <div id="card-who-more-desc" class="card-desc">Compare two groups and pick who has more items.</div>
+        <span id="card-who-more-badge" class="card-badge">Count + Compare</span>
+      </div>
+
+      <div class="game-card" data-game="whatMore" role="button" tabindex="0" aria-label="What Is More game">
+        <div class="card-icon">👀</div>
+        <div id="card-what-more-title" class="card-title">What Is More?</div>
+        <div id="card-what-more-desc" class="card-desc">Spot which item appears more in the scene.</div>
+        <span id="card-what-more-badge" class="card-badge">Comparison</span>
+      </div>
+
+      <div class="game-card" data-game="compound" role="button" tabindex="0" aria-label="Compound Crunch game">
+        <div class="card-icon">➕➖</div>
+        <div id="card-compound-title" class="card-title">Compound Crunch</div>
+        <div id="card-compound-desc" class="card-desc">Solve a two-step problem like x + y - z.</div>
+        <span id="card-compound-badge" class="card-badge">Compound Operations</span>
       </div>
 
       <div class="game-card" data-game="weight" role="button" tabindex="0" aria-label="Weight Trouble game">
         <div class="card-icon">⚖️</div>
-        <div class="card-title">Weight Trouble</div>
-        <div class="card-desc">Wrong weight comparison launches Milo off the seesaw — BOING!</div>
-        <span class="card-badge">Heavier &amp; Lighter</span>
+        <div id="card-weight-title" class="card-title">Weight Trouble</div>
+        <div id="card-weight-desc" class="card-desc">Wrong weight comparison launches Milo off the seesaw — BOING!</div>
+        <span id="card-weight-badge" class="card-badge">Heavier &amp; Lighter</span>
       </div>
 
     </div>
@@ -110,7 +140,7 @@
   <!-- Environment badge – shown only in staging (set by config.js + game.js) -->
   <div id="env-badge" style="display:none; position:fixed; top:0; left:0; right:0;
        background:#FF4081; color:#fff; text-align:center; padding:6px 0; font-size:.9rem;
-       font-family: 'Comic Sans MS', cursive; z-index:9999; letter-spacing:1px;">
+       font-family: 'Comic Sans MS', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', cursive; z-index:9999; letter-spacing:1px;">
     🚧 STAGING ENVIRONMENT — not for production use 🚧
   </div>
 
